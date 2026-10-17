@@ -771,6 +771,7 @@ input.invalid, textarea.invalid { border-color: var(--rose-600); box-shadow: 0 0
     font-weight: 500;
 }
 .category-list .chip { min-width: 2rem; justify-content: center; font-family: var(--font-mono); letter-spacing: normal; }
+.category-list .muted { display: block; margin-top: .125rem; }
 .help-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
 .help-grid > .wide { grid-column: 1 / -1; }
 
