@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PanBug: trening testowania oprogramowania</title>
+    <meta name="description" content="Darmowy trening testowania oprogramowania w przeglądarce. 24 zadania z ukrytymi defektami w ośmiu aplikacjach: znajdź błąd, odtwórz go i zgłoś z właściwą kategorią." />
+    <meta name="theme-color" content="#111111" />
+    <meta name="color-scheme" content="light dark" />
+    <base href="/" />
+
+    <!-- Adres strony: build-static.sh podmienia go na SITE_URL (np. adres na Render). -->
+    <link rel="canonical" href="https://rembednarczyk.github.io/PanBug/" />
+
+    <!-- Podgląd linku (Facebook, LinkedIn, Slack, Teams, Discord, X) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PanBug" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:url" content="https://rembednarczyk.github.io/PanBug/" />
+    <meta property="og:title" content="PanBug: znajdź 24 ukryte defekty" />
+    <meta property="og:description" content="Trening testowania oprogramowania w przeglądarce. Odtwórz błąd, wybierz kategorię, zdobądź punkty." />
+    <meta property="og:image" content="https://rembednarczyk.github.io/PanBug/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="PanBug: Znajdź 24 ukryte defekty. Karta zadania z siatką 24 zadań i przyciskiem Zgłoś defekt." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PanBug: znajdź 24 ukryte defekty" />
+    <meta name="twitter:description" content="Trening testowania oprogramowania w przeglądarce. Odtwórz błąd, wybierz kategorię, zdobądź punkty." />
+    <meta name="twitter:image" content="https://rembednarczyk.github.io/PanBug/og-image.png" />
+    <meta name="twitter:image:alt" content="PanBug: Znajdź 24 ukryte defekty." />
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="PanBug" />
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "PanBug",
+        "url": "https://rembednarczyk.github.io/PanBug/",
+        "image": "https://rembednarczyk.github.io/PanBug/og-image.png",
+        "description": "Trening testowania oprogramowania w przeglądarce: 24 zadania z ukrytymi defektami do znalezienia, odtworzenia i zgłoszenia.",
+        "inLanguage": "pl",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Dowolny system z nowoczesną przeglądarką",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "PLN" }
+    }
+    </script>
+
+    <link rel="stylesheet" href="app.css" />
+    <script src="theme-init.js"></script>
+    <script src="start-at-home.js"></script>
+    <noscript><style>.boot { display: none; }</style></noscript>
+</head>
+<body>
+    <div id="app">
+        <div class="boot">
+            <div class="boot-brand">
+                <img src="favicon.svg" width="40" height="40" alt="" />
+                <span class="boot-name">Pan<span>Bug</span></span>
+            </div>
+            <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+            <p>Wczytywanie aplikacji</p>
+        </div>
+    </div>
+    <noscript>
+        <div class="noscript">
+            <strong>PanBug potrzebuje JavaScriptu.</strong>
+            Gra działa w całości w przeglądarce. Włącz JavaScript i odśwież stronę.
+        </div>
+    </noscript>
+    <div id="blazor-error-ui">
+        Wystąpił nieoczekiwany błąd. <a href="" class="reload">Odśwież stronę</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

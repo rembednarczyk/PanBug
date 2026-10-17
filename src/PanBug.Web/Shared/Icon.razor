@@ -1,0 +1,11 @@
+@* Ikona Lucide rysowana jako inline SVG w kolorze tekstu rodzica. Dekoracyjna (aria-hidden). *@
+<svg class="icon @Class" xmlns="http://www.w3.org/2000/svg" width="@Size" height="@Size" viewBox="0 0 24 24"
+     fill="none" stroke="currentColor" stroke-width="@StrokeWidth" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" focusable="false">@((MarkupString)LucideIcons.Shape(Name))</svg>
+
+@code {
+    [Parameter, EditorRequired] public string Name { get; set; } = string.Empty;
+    [Parameter] public int Size { get; set; } = 16;
+    [Parameter] public double StrokeWidth { get; set; } = 2;
+    [Parameter] public string? Class { get; set; }
+}

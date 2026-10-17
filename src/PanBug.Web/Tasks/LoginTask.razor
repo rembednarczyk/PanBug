@@ -1,0 +1,84 @@
+@inherits TaskComponentBase<LoginSimulationBase>
+@using PanBug.Domain.Tasks.Login
+
+<div class="form-stack">
+    @if (Sim.Screen == LoginScreen.LoggedIn)
+    {
+            <p class="output">Zalogowano jako @Sim.LoggedInAs.</p>
+            <button class="primary" @onclick="Logout">Wyloguj</button>
+    }
+    else if (Sim.Screen == LoginScreen.Reset)
+    {
+            <h3>Reset hasła</h3>
+            <label>Adres e-mail*
+                <input type="email" maxlength="100" autocomplete="off" @bind="email" />
+            </label>
+            <Alert Text="@Message" Error="MessageIsError" />
+            <div class="button-row">
+                <button @onclick="BackToLogin">Wróć do logowania</button>
+                <button class="primary" @onclick="RequestReset">Wyślij link</button>
+            </div>
+    }
+    else
+    {
+            <h3>Logowanie</h3>
+            <label>Login*
+                <input maxlength="50" autocomplete="off" @bind="Sim.LoginText" />
+            </label>
+            <label>Hasło*
+                <input type="password" maxlength="50" autocomplete="off" @bind="Sim.PasswordText" />
+            </label>
+            <Alert Text="@Message" Error="MessageIsError" />
+            <button class="primary" @onclick="Login">Zaloguj</button>
+            <div class="button-row">
+                <button class="link" @onclick="ShowReset">Nie pamiętam hasła</button>
+            </div>
+            <div class="admin-box">
+                <p class="eyebrow">Panel administratora (symulacja)</p>
+                <button @onclick="Unlock">Odblokuj konto</button>
+            </div>
+    }
+</div>
+
+@code {
+    private string email = string.Empty;
+
+    private void Login()
+    {
+        var result = Sim.Login();
+        if (result.Success) ClearMessage();
+        else ShowResult(result);
+    }
+
+    private void Logout()
+    {
+        Sim.Logout();
+        ClearMessage();
+    }
+
+    private void ShowReset()
+    {
+        Sim.ShowReset();
+        ClearMessage();
+    }
+
+    private void BackToLogin()
+    {
+        Sim.ShowLogin();
+        ClearMessage();
+    }
+
+    private void RequestReset()
+    {
+        var result = Sim.RequestReset(email);
+        Message = result.Message;
+        MessageIsError = !result.Success;
+    }
+
+    private void Unlock()
+    {
+        Sim.Unlock();
+        Message = "Administrator odblokował konto.";
+        MessageIsError = false;
+    }
+}

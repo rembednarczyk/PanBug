@@ -1,0 +1,98 @@
+@inherits TaskComponentBase<LeaveSimulationBase>
+@using PanBug.Domain.Tasks.Leave
+
+<div class="table-wrap">
+    <table class="grid">
+        <thead><tr><th>Rok</th><th class="r">Przysługuje</th><th class="r">Zarezerwowane</th><th class="r">Pozostało</th></tr></thead>
+        <tbody>
+            @foreach (var year in Sim.Years)
+            {
+                <tr>
+                    <td>@year</td>
+                    <td class="r">@LeaveSimulationBase.AnnualDays</td>
+                    <td class="r">@Sim.Used(year)</td>
+                    <td class="r">@Sim.Remaining(year)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="form-stack">
+    <h3>Nowy wniosek</h3>
+    <div class="row-form">
+        <label>Od*
+            <input type="date" min="@Min" max="@Max" value="@from" @onchange="e => from = e.Value?.ToString() ?? string.Empty" />
+        </label>
+        <label>Do*
+            <input type="date" min="@Min" max="@Max" value="@to" @onchange="e => to = e.Value?.ToString() ?? string.Empty" />
+        </label>
+    </div>
+    <Alert Text="@Message" Error="MessageIsError" />
+    <button class="primary" @onclick="Submit">Złóż wniosek</button>
+</div>
+
+@if (Sim.Requests.Count > 0)
+{
+    <h3>Wnioski</h3>
+    <div class="table-wrap">
+        <table class="grid">
+            <thead><tr><th class="r">Nr</th><th>Od</th><th>Do</th><th class="r">Dni</th><th>Z puli</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var request in Sim.Requests)
+                {
+                    <tr>
+                        <td class="r">@request.Id</td>
+                        <td class="mono">@PolishNumber.Date(request.From)</td>
+                        <td class="mono">@PolishNumber.Date(request.To)</td>
+                        <td class="r">@request.Days</td>
+                        <td>@string.Join(", ", request.DaysByYear.OrderBy(d => d.Key).Select(d => $"{d.Key}: {d.Value}"))</td>
+                        <td><span class="chip @StatusClass(request.Status)">@StatusText(request.Status)</span></td>
+                        <td class="r">
+                            <span class="button-row end">
+                                @if (request.Status == LeaveStatus.Pending)
+                                {
+                                    <button class="soft" @onclick="() => Sim.Approve(request)">Zaakceptuj</button>
+                                }
+                                @if (request.Status != LeaveStatus.Cancelled)
+                                {
+                                    <button @onclick="() => Sim.Cancel(request)">Anuluj</button>
+                                }
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private string from = string.Empty;
+    private string to = string.Empty;
+
+    private string Min => $"{Sim.Today.Year}-01-01";
+    private string Max => $"{Sim.Today.Year + 1}-12-31";
+
+    private void Submit()
+    {
+        var result = Sim.Submit(from, to);
+        ShowResult(result);
+        if (result.Success)
+            from = to = string.Empty;
+    }
+
+    private static string StatusText(LeaveStatus status) => status switch
+    {
+        LeaveStatus.Approved => "zaakceptowany",
+        LeaveStatus.Cancelled => "anulowany",
+        _ => "oczekuje",
+    };
+
+    private static string StatusClass(LeaveStatus status) => status switch
+    {
+        LeaveStatus.Approved => "emerald",
+        LeaveStatus.Cancelled => "slate",
+        _ => "",
+    };
+}

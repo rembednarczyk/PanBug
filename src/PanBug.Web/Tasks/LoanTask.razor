@@ -1,0 +1,90 @@
+@inherits TaskComponentBase<LoanSimulationBase>
+@using PanBug.Domain.Tasks.Loan
+
+<div class="form-stack">
+    <label>Kwota kredytu (zł)*
+        <input class="num" inputmode="decimal" maxlength="15" placeholder="np. 25 000" @bind="Sim.AmountText" />
+    </label>
+    <label>Oprocentowanie roczne (%)*
+        <input class="num short" inputmode="decimal" maxlength="6" placeholder="np. 7,5" @bind="Sim.RateText" />
+    </label>
+    <div class="row-form">
+        <label>Okres kredytu*
+            @* Zapis przy każdym znaku: zmiana jednostki zaraz po wpisaniu (bez opuszczenia pola)
+               musi przeliczyć już wpisaną wartość, a nie tę zapisaną dopiero przy utracie fokusu. *@
+            <input class="num short" inputmode="numeric" data-filter="digits" data-max="3"
+                   @bind="Sim.PeriodText" @bind:event="oninput" />
+        </label>
+        <label>Jednostka
+            <select value="@Sim.Unit" @onchange="ChangeUnit">
+                <option value="@PeriodUnit.Months">miesiące</option>
+                <option value="@PeriodUnit.Years">lata</option>
+            </select>
+        </label>
+    </div>
+    <Alert Text="@Message" Error="MessageIsError" />
+    <button class="primary" @onclick="Calculate">Oblicz ratę</button>
+</div>
+
+@if (Sim.Result is { } result)
+{
+    <dl class="details result-summary">
+        <dt>Rata miesięczna</dt><dd class="output">@Payment(result.MonthlyPayment)</dd>
+        <dt>Okres</dt><dd>@result.Months @Utils.PluralPl(result.Months, "miesiąc", "miesiące", "miesięcy")</dd>
+        <dt>Kwota kredytu</dt><dd>@PolishNumber.Money(result.Amount)</dd>
+        @if (result.HasSchedule)
+        {
+            <dt>Suma odsetek</dt><dd>@PolishNumber.Money(result.TotalInterest)</dd>
+            <dt>Łącznie do spłaty</dt><dd>@PolishNumber.Money(result.TotalPaid)</dd>
+        }
+    </dl>
+
+    @if (result.HasSchedule)
+    {
+        <h3>Harmonogram spłaty</h3>
+        <div class="table-wrap tall">
+            <table class="grid compact">
+                <thead><tr><th class="r">Nr</th><th class="r">Rata</th><th class="r">Kapitał</th><th class="r">Odsetki</th><th class="r">Pozostało do spłaty</th></tr></thead>
+                <tbody>
+                    @foreach (var row in result.Schedule)
+                    {
+                        <tr>
+                            <td class="r">@row.Number</td>
+                            <td class="r">@PolishNumber.Money(row.Payment)</td>
+                            <td class="r">@PolishNumber.Money(row.Principal)</td>
+                            <td class="r">@PolishNumber.Money(row.Interest)</td>
+                            <td class="r">@PolishNumber.Money(row.Remaining)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Razem</td>
+                        <td class="r">@PolishNumber.Money(result.TotalPaid)</td>
+                        <td class="r">@PolishNumber.Money(result.TotalPrincipal)</td>
+                        <td class="r">@PolishNumber.Money(result.TotalInterest)</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    private void ChangeUnit(ChangeEventArgs e)
+    {
+        if (Enum.TryParse<PeriodUnit>(e.Value?.ToString(), out var unit))
+            Sim.SetUnit(unit);
+    }
+
+    private void Calculate()
+    {
+        var result = Sim.Calculate();
+        if (result.Success) ClearMessage();
+        else ShowResult(result);
+    }
+
+    /// <summary>Rata wprost z obliczenia, łącznie z wynikiem, który nie jest liczbą.</summary>
+    private static string Payment(double value) => value.ToString("N2", PolishNumber.Culture) + " zł";
+}

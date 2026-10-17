@@ -1,0 +1,151 @@
+@inherits TaskComponentBase<CinemaSimulationBase>
+@using PanBug.Domain.Tasks.Cinema
+
+<div class="form-stack wide-stack">
+    @if (Sim.Stage == CinemaStage.Showings)
+    {
+            <div class="segmented" role="group" aria-label="Dzień seansu">
+                @foreach (var day in Sim.Days)
+                {
+                    <button aria-pressed="@(day == Sim.SelectedDay ? "true" : "false")"
+                            @onclick="() => SelectDay(day)">@DayLabel(day)</button>
+                }
+            </div>
+            <div class="table-wrap">
+                <table class="grid">
+                    <thead><tr><th>Godzina</th><th>Film</th><th>Sala</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var showing in Sim.ShowingsFor(Sim.SelectedDay))
+                        {
+                            <tr>
+                                <td class="mono">@showing.Start.ToString("HH:mm")</td>
+                                <td>@showing.Title</td>
+                                <td>@showing.Hall</td>
+                                <td class="r"><button class="soft" @onclick="() => SelectShowing(showing)">Wybierz miejsca</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+    }
+    else if (Sim.Stage == CinemaStage.Seats)
+    {
+            <ShowingHeader Showing="Sim.Selected" />
+            <div class="screen" aria-hidden="true">EKRAN</div>
+            <div class="seat-map" role="group" aria-label="Plan sali">
+                @for (int row = 1; row <= CinemaSimulationBase.Rows; row++)
+                {
+                    <div class="seat-row">
+                        <span class="seat-row-label">@row</span>
+                        @for (int number = 1; number <= CinemaSimulationBase.SeatsPerRow; number++)
+                        {
+                            var seat = new Seat(row, number);
+                            var occupied = Sim.IsOccupied(seat);
+                            var selected = Sim.IsSelected(seat);
+                            <button class="seat @(occupied ? "taken" : selected ? "chosen" : "")"
+                                    disabled="@occupied" aria-pressed="@(selected ? "true" : "false")"
+                                    aria-label="@SeatLabel(seat, occupied)"
+                                    @onclick="() => Toggle(seat)">@number</button>
+                        }
+                    </div>
+                }
+            </div>
+            <p class="legend-row"><span><span class="dot"></span>wolne</span><span><span class="dot active"></span>wybrane</span><span><span class="dot taken"></span>zajęte</span></p>
+
+            @if (Sim.Tickets.Count > 0)
+            {
+                <h3>Bilety</h3>
+                @foreach (var ticket in Sim.Tickets)
+                {
+                    <label>Wiek widza (@ticket.Seat)*
+                        <input class="num short" inputmode="numeric" data-filter="digits" data-max="3" @bind="ticket.Age" />
+                    </label>
+                }
+            }
+
+            <Alert Text="@Message" Error="MessageIsError" />
+            <div class="button-row">
+                <button @onclick="BackToShowings">Zmień seans</button>
+                <button class="primary" @onclick="Summarize">Podsumowanie</button>
+            </div>
+    }
+    else if (Sim.Stage == CinemaStage.Summary && Sim.Summary is not null)
+    {
+            <ShowingHeader Showing="Sim.Selected" />
+            <div class="table-wrap">
+                <table class="grid">
+                    <thead><tr><th>Miejsce</th><th class="r">Wiek</th><th>Bilet</th><th class="r">Cena</th></tr></thead>
+                    <tbody>
+                        @foreach (var line in Sim.Summary.Lines)
+                        {
+                            <tr>
+                                <td>@line.Seat</td>
+                                <td class="r">@line.Age</td>
+                                <td>@(line.Reduced ? "ulgowy" : "normalny")</td>
+                                <td class="r">@PolishNumber.Money(line.Price)</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot><tr><td colspan="3">Razem (@Sim.Summary.Lines.Count @Utils.PluralPl(Sim.Summary.Lines.Count, "bilet", "bilety", "biletów"))</td><td class="r">@PolishNumber.Money(Sim.Summary.Total)</td></tr></tfoot>
+                </table>
+            </div>
+            <Alert Text="@Message" Error="MessageIsError" />
+            <div class="button-row">
+                <button @onclick="BackToSeats">Wróć do miejsc</button>
+                <button class="primary" @onclick="Book">Rezerwuj</button>
+            </div>
+    }
+    else if (Sim.Stage == CinemaStage.Booked)
+    {
+            <Alert Text="@Message" Error="false" />
+            <button class="link" @onclick="BackToShowings">Nowa rezerwacja</button>
+    }
+</div>
+
+@code {
+    private static string SeatLabel(Seat seat, bool occupied) =>
+        $"Rząd {seat.Row}, miejsce {seat.Number}" + (occupied ? ", zajęte" : "");
+
+    private static string DayLabel(DateOnly day) =>
+        day.ToString("dddd, dd.MM", PolishNumber.Culture);
+
+    private void SelectDay(DateOnly day)
+    {
+        Sim.SelectDay(day);
+        ClearMessage();
+    }
+
+    private void SelectShowing(Showing showing)
+    {
+        Sim.SelectShowing(showing);
+        ClearMessage();
+    }
+
+    private void Toggle(Seat seat)
+    {
+        var result = Sim.ToggleSeat(seat);
+        if (result.Success) ClearMessage();
+        else ShowResult(result);
+    }
+
+    private void Summarize()
+    {
+        var result = Sim.Summarize();
+        if (result.Success) ClearMessage();
+        else ShowResult(result);
+    }
+
+    private void BackToSeats()
+    {
+        Sim.BackToSeats();
+        ClearMessage();
+    }
+
+    private void BackToShowings()
+    {
+        Sim.BackToShowings();
+        ClearMessage();
+    }
+
+    private void Book() => ShowResult(Sim.Book());
+}

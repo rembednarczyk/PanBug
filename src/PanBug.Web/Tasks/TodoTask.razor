@@ -1,0 +1,76 @@
+@inherits TaskComponentBase<TodoSimulationBase>
+@using PanBug.Domain.Tasks.Todo
+
+<p class="muted">Dziś: @PolishNumber.Date(Sim.Today)</p>
+
+<div class="row-form">
+    <div class="segmented" role="group" aria-label="Filtr zadań">
+        @foreach (var (filter, label) in Filters)
+        {
+            <button aria-pressed="@(Sim.Filter == filter ? "true" : "false")" @onclick="() => Sim.SetFilter(filter)">@label</button>
+        }
+    </div>
+    <button @onclick="Sim.SortByDue">Sortuj po terminie</button>
+</div>
+
+<div class="table-wrap">
+    <table class="grid">
+        <thead><tr><th>Zrobione</th><th>Zadanie</th><th>Termin</th><th></th></tr></thead>
+        <tbody>
+            @{ var visible = Sim.Visible; }
+            @if (visible.Count == 0)
+            {
+                <tr><td colspan="4" class="muted">Brak zadań w tym widoku.</td></tr>
+            }
+            @for (int i = 0; i < visible.Count; i++)
+            {
+                var index = i;
+                var item = visible[i];
+                <tr class="@(item.Done ? "done-row" : "")">
+                    <td><input type="checkbox" checked="@item.Done" aria-label="Zrobione: @item.Title" @onchange="() => Sim.ToggleDone(item)" /></td>
+                    <td>@item.Title</td>
+                    <td class="mono">@PolishNumber.Date(item.Due)</td>
+                    <td class="r"><button class="soft" aria-label="Usuń: @item.Title" @onclick="() => Sim.DeleteVisibleAt(index)">Usuń</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="form-stack">
+    <h3>Nowe zadanie</h3>
+    <label>Treść*
+        <input maxlength="@TodoSimulationBase.TitleMaxLength" @bind="title" />
+    </label>
+    <label>Termin*
+        <input type="date" value="@due" @onchange="e => due = e.Value?.ToString() ?? string.Empty" />
+    </label>
+    <Alert Text="@Message" Error="MessageIsError" />
+    <button class="primary" @onclick="Add">Dodaj zadanie</button>
+</div>
+
+@code {
+    private static readonly (TodoFilter, string)[] Filters =
+    {
+        (TodoFilter.All, "Wszystkie"),
+        (TodoFilter.Overdue, "Zaległe"),
+        (TodoFilter.Done, "Ukończone"),
+    };
+
+    private string title = string.Empty;
+    private string due = string.Empty;
+
+    private void Add()
+    {
+        var result = Sim.Add(title, due);
+        if (result.Success)
+        {
+            title = due = string.Empty;
+            ClearMessage();
+        }
+        else
+        {
+            ShowResult(result);
+        }
+    }
+}

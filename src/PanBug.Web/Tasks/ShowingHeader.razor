@@ -1,0 +1,15 @@
+@using PanBug.Domain.Tasks.Cinema
+
+@* Wybrany seans: tytuł, pełna data i sala (data pokazuje dzień rozpoczęcia seansu). *@
+@if (Showing is not null)
+{
+    <dl class="details">
+        <dt>Film</dt><dd>@Showing.Title</dd>
+        <dt>Seans</dt><dd>@Showing.Start.ToString("dddd, dd.MM.yyyy, HH:mm", PolishNumber.Culture)</dd>
+        <dt>Sala</dt><dd>@Showing.Hall</dd>
+    </dl>
+}
+
+@code {
+    [Parameter] public Showing? Showing { get; set; }
+}

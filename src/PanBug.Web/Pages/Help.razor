@@ -1,0 +1,57 @@
+@page "/pomoc"
+
+<PageTitle>Pomoc · PanBug</PageTitle>
+
+<section class="card page-head">
+    <div>
+        <h1><span class="icon-chip"><Icon Name="circle-help" Size="20" /></span>Pomoc</h1>
+        <p>Jak grać, jak liczone są punkty i gdzie zapisują się wyniki.</p>
+    </div>
+</section>
+
+<div class="help-grid">
+    <section class="card">
+        <header class="card-head">
+            <h2><Icon Name="list-ordered" Size="16" />Jak grać</h2>
+        </header>
+        <div class="card-body">
+            <ol class="steps">
+                <li><span>Przeczytaj opis zadania - określa, jak aplikacja <em>powinna</em> działać.</span></li>
+                <li><span>Przetestuj aplikację i znajdź zachowanie niezgodne z opisem lub zdrowym rozsądkiem.</span></li>
+                <li><span>Odtwórz defekt. Liczy się tylko defekt wywołany w aplikacji (aplikacja zapisuje Twoje akcje).</span></li>
+                <li><span>Kliknij <strong>ZGŁOŚ DEFEKT</strong> i wybierz kategorie pasujące do defektu.
+                    Po zatwierdzeniu nie można wrócić do zadania.</span></li>
+                <li><span><strong>Odśwież</strong> przywraca zadanie do stanu początkowego i czyści zapis Twoich akcji.</span></li>
+                <li><span><strong>ZAKOŃCZ</strong> przelicza wynik na podstawie ukończonych zadań.</span></li>
+            </ol>
+        </div>
+    </section>
+
+    <section class="card">
+        <header class="card-head">
+            <h2><Icon Name="hard-drive" Size="16" />Wyniki</h2>
+        </header>
+        <div class="card-body">
+            <p>Gra działa w całości w przeglądarce i nie wysyła danych do żadnego serwera. Najlepszy wynik
+                i historia ostatnich gier zapisują się w pamięci przeglądarki na tym urządzeniu.</p>
+            <div class="warning"><Icon Name="triangle-alert" Size="16" />
+                <span>Bieżąca gra jest tylko w pamięci karty - jej zamknięcie lub przeładowanie
+                    przerywa grę (przeglądarka zapyta o potwierdzenie).</span></div>
+        </div>
+    </section>
+
+    <section class="card wide">
+        <header class="card-head">
+            <h2><Icon Name="tags" Size="16" />Kategorie defektów</h2>
+            <span class="chip slate">@DefectCategories.All.Count</span>
+        </header>
+        <div class="card-body">
+            <ul class="category-list">
+                @foreach (var answer in DefectCategories.All)
+                {
+                    <li><span class="chip">@answer.Number</span><span><strong>@answer.Content</strong><span class="muted">@answer.Hint</span></span></li>
+                }
+            </ul>
+        </div>
+    </section>
+</div>

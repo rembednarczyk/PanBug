@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>PanBug.Domain</RootNamespace>
+    <AssemblyName>PanBug.Domain</AssemblyName>
+  </PropertyGroup>
+</Project>

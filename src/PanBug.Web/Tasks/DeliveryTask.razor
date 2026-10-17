@@ -1,0 +1,91 @@
+@inherits TaskComponentBase<DeliverySimulationBase>
+@using PanBug.Domain.Tasks.Delivery
+
+@if (Sim.Order is { } order)
+{
+    <div class="form-stack">
+        <Alert Text="@Message" Error="false" />
+        <dl class="details">
+            <dt>Odbiorca</dt><dd>@order.FirstName @order.LastName</dd>
+            <dt>Adres</dt><dd>@order.Street, @order.PostalCode @order.City</dd>
+            <dt>Telefon</dt><dd class="mono">@order.Phone</dd>
+            <dt>Uwagi (@order.Notes.Length @Utils.PluralPl(order.Notes.Length, "znak", "znaki", "znaków"))</dt>
+            <dd class="notes">@(order.Notes.Length > 0 ? order.Notes : "brak")</dd>
+        </dl>
+        <button class="link" @onclick="NewOrder">Nowe zamówienie</button>
+    </div>
+}
+else
+{
+    <div class="form-stack">
+        <div class="row-form">
+            <FormField Label="Imię*" Kind="DeliveryField.FirstName" Sim="Sim" Error="@ErrorOf(DeliveryField.FirstName)">
+                <input id="@DeliverySimulationBase.FieldId(DeliveryField.FirstName)" maxlength="50" autocomplete="off"
+                       class="@InputClass(DeliveryField.FirstName)" @attributes="ErrorAttributes(DeliveryField.FirstName)" @bind="Sim.FirstName" />
+            </FormField>
+            <FormField Label="Nazwisko*" Kind="DeliveryField.LastName" Sim="Sim" Error="@ErrorOf(DeliveryField.LastName)">
+                <input id="@DeliverySimulationBase.FieldId(DeliveryField.LastName)" maxlength="50" autocomplete="off"
+                       class="@InputClass(DeliveryField.LastName)" @attributes="ErrorAttributes(DeliveryField.LastName)" @bind="Sim.LastName" />
+            </FormField>
+        </div>
+        <FormField Label="Ulica i numer*" Kind="DeliveryField.Street" Sim="Sim" Error="@ErrorOf(DeliveryField.Street)">
+            <input id="@DeliverySimulationBase.FieldId(DeliveryField.Street)" maxlength="100" autocomplete="off"
+                   class="@InputClass(DeliveryField.Street)" @attributes="ErrorAttributes(DeliveryField.Street)" @bind="Sim.Street" />
+        </FormField>
+        <div class="row-form">
+            <FormField Label="Kod pocztowy*" Kind="DeliveryField.PostalCode" Sim="Sim" Error="@ErrorOf(DeliveryField.PostalCode)">
+                <input id="@DeliverySimulationBase.FieldId(DeliveryField.PostalCode)" class="@InputClass(DeliveryField.PostalCode, "mono short")" maxlength="6"
+                       placeholder="00-000" autocomplete="off"
+                       @attributes="ErrorAttributes(DeliveryField.PostalCode)" @bind="Sim.PostalCode" />
+            </FormField>
+            <FormField Label="Miejscowość*" Kind="DeliveryField.City" Sim="Sim" Error="@ErrorOf(DeliveryField.City)">
+                <input id="@DeliverySimulationBase.FieldId(DeliveryField.City)" maxlength="50" autocomplete="off"
+                       class="@InputClass(DeliveryField.City)" @attributes="ErrorAttributes(DeliveryField.City)" @bind="Sim.City" />
+            </FormField>
+        </div>
+        <FormField Label="Telefon*" Kind="DeliveryField.Phone" Sim="Sim" Error="@ErrorOf(DeliveryField.Phone)">
+            <input id="@DeliverySimulationBase.FieldId(DeliveryField.Phone)" type="tel" maxlength="20"
+                   placeholder="+48 600 000 000" autocomplete="off"
+                   class="@InputClass(DeliveryField.Phone)" @attributes="ErrorAttributes(DeliveryField.Phone)" @bind="Sim.Phone" />
+        </FormField>
+        <FormField Label="Uwagi do zamówienia" Kind="DeliveryField.Notes" Sim="Sim" Error="@ErrorOf(DeliveryField.Notes)">
+            <textarea id="@DeliverySimulationBase.FieldId(DeliveryField.Notes)" rows="4"
+                      maxlength="@DeliverySimulationBase.NotesMaxLength"
+                      class="@InputClass(DeliveryField.Notes)" @attributes="ErrorAttributes(DeliveryField.Notes)"
+                      @bind="Sim.Notes" @bind:event="oninput"></textarea>
+            <span class="counter" aria-live="polite">Pozostało znaków: @(DeliverySimulationBase.NotesMaxLength - Sim.Notes.Length)</span>
+        </FormField>
+        <Alert Text="@Message" Error="MessageIsError" />
+        <button class="primary" @onclick="Submit">Zamów</button>
+    </div>
+}
+
+@code {
+    private string? ErrorOf(DeliveryField field) => Sim.Errors.GetValueOrDefault(field);
+
+    private string InputClass(DeliveryField field, string extra = "") =>
+        (Sim.Errors.ContainsKey(field) ? "invalid " + extra : extra).Trim();
+
+    /// <summary>
+    /// Pole z błędem dostaje aria-invalid, a opis błędu jest wiązany przez aria-describedby,
+    /// o ile formularz opisuje błędy tekstem.
+    /// </summary>
+    private Dictionary<string, object> ErrorAttributes(DeliveryField field)
+    {
+        var attributes = new Dictionary<string, object>();
+        if (!Sim.Errors.ContainsKey(field))
+            return attributes;
+        attributes["aria-invalid"] = "true";
+        if (Sim.DescribesErrorsWithText)
+            attributes["aria-describedby"] = DeliverySimulationBase.FieldId(field) + "-error";
+        return attributes;
+    }
+
+    private void Submit() => ShowResult(Sim.Submit());
+
+    private void NewOrder()
+    {
+        Sim.NewOrder();
+        ClearMessage();
+    }
+}

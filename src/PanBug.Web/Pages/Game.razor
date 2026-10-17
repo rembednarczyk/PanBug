@@ -1,0 +1,164 @@
+@page "/gra"
+@implements IDisposable
+@using PanBug.Domain.Session
+@inject GameSession Session
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Zadanie #@(manager?.Current.Number) · PanBug</PageTitle>
+
+@if (manager is not null)
+{
+    var slot = manager.Current;
+    @* Gdy okno jest otwarte, plansza pod nim jest nieaktywna (także dla klawiatury): zgłoszenie
+       nie może trafić do innego zadania przełączonego Tabem pod spodem. *@
+    <div class="game" inert="@(reporting || confirmEnd || finishing)">
+        <aside class="card sidebar">
+            <div class="card-body">
+                <div class="stat">
+                    <span class="stat-label"><Icon Name="timer" Size="12" /> Czas gry</span>
+                    <span class="timer" title="Czas trwania">@Utils.FormatDuration(manager.Elapsed)</span>
+                </div>
+                <div class="progress">
+                    <div class="meter" role="progressbar" aria-label="Postęp gry" aria-valuemin="0"
+                         aria-valuemax="@manager.Tasks.Count" aria-valuenow="@manager.CompletedCount">
+                        <span style="width: @(Percent(manager.CompletedCount, manager.Tasks.Count))%"></span>
+                    </div>
+                    <div class="progress-text"><strong>@manager.CompletedCount/@manager.Tasks.Count</strong> ukończonych zadań</div>
+                </div>
+                <ol class="tiles">
+                    @for (int i = 0; i < manager.Tasks.Count; i++)
+                    {
+                        var index = i;
+                        var tile = manager.Tasks[i];
+                        var state = tile.IsCompleted ? "done" : index == manager.CurrentIndex ? "active" : "pending";
+                        <li>
+                            <button class="tile @state" disabled="@(tile.IsCompleted)"
+                                    aria-current="@(state == "active" ? "step" : null)"
+                                    title="Zadanie #@tile.Number" @onclick="() => Go(index)">@tile.Number</button>
+                        </li>
+                    }
+                </ol>
+                <p class="legend-row"><span><span class="dot active"></span>bieżące</span><span><span class="dot done"></span>ukończone</span></p>
+                <button class="danger wide" @onclick="() => confirmEnd = true"><Icon Name="circle-stop" Size="14" />ZAKOŃCZ</button>
+            </div>
+        </aside>
+
+        <section class="card task">
+            <header class="task-head">
+                <h1><span class="icon-chip"><Icon Name="bug" Size="20" /></span>Zadanie #@slot.Number</h1>
+                <span class="badge"><Icon Name="trophy" Size="12" />Punktów do zdobycia: @((int)slot.Simulation.Points)</span>
+            </header>
+            <p class="task-desc">@slot.Simulation.Description</p>
+            <div class="task-body">
+                <DynamicComponent @key="version"
+                                  Type="TaskComponentRegistry.ComponentFor(slot.Simulation)"
+                                  Parameters="Parameters(slot.Simulation)" />
+            </div>
+            <footer class="task-actions">
+                <button @onclick="() => manager.RunPrevTask()"><Icon Name="chevron-left" Size="14" />Poprzednie</button>
+                <button @onclick="() => manager.ResetTask()"><Icon Name="rotate-ccw" Size="14" />Odśwież</button>
+                <button @onclick="() => manager.RunNextTask()">Następne<Icon Name="chevron-right" Size="14" /></button>
+                <button class="primary" @onclick="() => OpenReport(slot.Number)"><Icon Name="flag" Size="14" />ZGŁOŚ DEFEKT</button>
+            </footer>
+        </section>
+    </div>
+
+    @if (reporting)
+    {
+        <DefectDialog TaskNumber="reportingNumber" OnConfirm="ConfirmDefectAsync" OnCancel="() => reporting = false" />
+    }
+    @if (confirmEnd)
+    {
+        <ConfirmDialog Title="Zakończenie"
+                       Text="Po zakończeniu Twój wynik zostanie przeliczony w oparciu o aktualnie rozwiązane zadania. Czy chcesz zakończyć?"
+                       OnYes="FinishAsync" OnNo="() => confirmEnd = false" />
+    }
+    @if (finishing)
+    {
+        <div class="modal-backdrop">
+            <div class="modal" role="status">
+                <div class="modal-body modal-loading">
+                    <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                    Zliczanie punktów...
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private TaskManager? manager;
+    private Timer? clock;
+    private int version;
+    private bool reporting;
+    private uint reportingNumber;
+    private bool confirmEnd;
+    private bool finishing;
+
+    protected override void OnInitialized()
+    {
+        // Gra startuje wyłącznie z ekranu powitalnego (ROZPOCZNIJ / Nowa gra / Zagraj ponownie).
+        // Wejście na /gra bez trwającej gry wraca na start zamiast po cichu zaczynać nową.
+        if (!Session.HasActiveGame)
+        {
+            Nav.NavigateTo("", replace: true);
+            return;
+        }
+
+        manager = Session.Manager!;
+        manager.TaskStarted += OnTaskStarted;
+        clock = new Timer(_ => InvokeAsync(StateHasChanged), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && manager is not null)
+            await JS.InvokeVoidAsync("panbug.setLeaveGuard", true);
+    }
+
+    private static Dictionary<string, object> Parameters(ITaskSimulation simulation) =>
+        new() { ["Simulation"] = simulation };
+
+    private void OnTaskStarted(object? sender, TaskEventArgs e) => version++;
+
+    private void Go(int index) => manager!.RunTask(index);
+
+    private static string Percent(int value, int total) =>
+        (total == 0 ? 0 : value * 100.0 / total).ToString("0.##", CultureInfo.InvariantCulture);
+
+    private void OpenReport(uint number)
+    {
+        reportingNumber = number;
+        reporting = true;
+    }
+
+    private async Task ConfirmDefectAsync(IReadOnlyList<uint> categories)
+    {
+        reporting = false;
+        // Zgłoszenie dotyczy zadania, dla którego otwarto okno; jeśli bieżące zadanie się zmieniło,
+        // nie przypisujemy kategorii innemu zadaniu.
+        if (manager!.Current.Number != reportingNumber)
+            return;
+        manager!.CompleteCurrentTask(categories);
+        if (manager.IsCompleted)
+            await FinishAsync();
+    }
+
+    private async Task FinishAsync()
+    {
+        confirmEnd = false;
+        finishing = true;
+        await Session.FinishAsync();
+        await JS.InvokeVoidAsync("panbug.setLeaveGuard", false);
+        Nav.NavigateTo("wynik");
+    }
+
+    public void Dispose()
+    {
+        clock?.Dispose();
+        if (manager is not null)
+            manager.TaskStarted -= OnTaskStarted;
+    }
+}

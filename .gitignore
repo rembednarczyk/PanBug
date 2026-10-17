@@ -1,0 +1,10 @@
+bin/
+obj/
+*.user
+.vs/
+reports/
+*.db
+*.db-shm
+*.db-wal
+artifacts/
+publish/

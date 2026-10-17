@@ -1,0 +1,80 @@
+@page "/wynik"
+@inject GameSession Session
+@inject NavigationManager Nav
+
+<PageTitle>Wynik · PanBug</PageTitle>
+
+@if (Session.LastScore is { } score && Session.LastReport is { } report)
+{
+    <section class="card narrow">
+        <header class="card-head">
+            <h2><Icon Name="flag" Size="16" />Koniec gry</h2>
+            @if (Session.IsNewRecord)
+            {
+                <span class="record"><Icon Name="trophy" Size="12" />Nowy rekord!</span>
+            }
+        </header>
+        <div class="card-body result">
+            <span class="icon-chip lg"><Icon Name="trophy" Size="28" /></span>
+            <h1>KONIEC</h1>
+            <div class="points">@score.Points</div>
+            <div class="points-label">@Utils.PluralPl(score.Points, "PUNKT", "PUNKTY", "PUNKTÓW") z @score.MaxPoints</div>
+
+            <div class="stat-grid boxed">
+                <div class="stat">
+                    <span class="stat-label">Czas trwania</span>
+                    <span class="stat-value long">@Utils.FormatDuration(report.Duration, milliseconds: true)</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Ukończone zadania</span>
+                    <span class="stat-value">@report.NumberOfCompletedTasks/@report.Tasks.Count</span>
+                </div>
+                @if (Session.Best is { } best)
+                {
+                    <div class="stat">
+                        <span class="stat-label">Najlepszy wynik</span>
+                        <span class="stat-value score">@best.Points</span>
+                    </div>
+                }
+            </div>
+
+            <details>
+                <summary>Szczegóły zgłoszeń</summary>
+                <div class="table-wrap">
+                    <table class="grid">
+                        <thead><tr><th>Zadanie</th><th class="r">Punkty</th><th>Defekt odtworzony</th><th>Kategoria trafiona</th></tr></thead>
+                        <tbody>
+                            @foreach (var task in score.Breakdown.Where(t => report.Tasks.First(r => r.Number == t.TaskNumber).IsCompleted))
+                            {
+                                <tr>
+                                    <td>#@task.TaskNumber</td>
+                                    <td class="r">@task.AwardedPoints/@task.MaxPoints</td>
+                                    <td class="@(task.Reproduced ? "yes" : "no")">@(task.Reproduced ? "tak" : "nie")</td>
+                                    <td class="@(task.CategoryMatched ? "yes" : "no")">@(task.CategoryMatched ? "tak" : "nie")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            <div class="actions">
+                <button class="primary big" @onclick="PlayAgain"><Icon Name="rotate-ccw" Size="16" />Zagraj ponownie</button>
+                <a class="button big" href=""><Icon Name="house" Size="16" />Strona główna</a>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!Session.HasResult)
+            Nav.NavigateTo("", replace: true); // replace: inaczej "Wstecz" wraca na /wynik i znów przekierowuje
+    }
+
+    private void PlayAgain()
+    {
+        Session.StartGame();
+        Nav.NavigateTo("gra");
+    }
+}

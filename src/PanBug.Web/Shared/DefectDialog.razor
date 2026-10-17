@@ -1,0 +1,84 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* Okno zgłoszenia defektu: wybór kategorii i potwierdzenie (bez możliwości powrotu). *@
+<div class="modal-backdrop">
+    <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="defect-title"
+         tabindex="-1" @ref="dialog">
+        <header class="card-head md">
+            <h2 id="defect-title"><Icon Name="flag" Size="16" />ZGŁOSZENIE DEFEKTU - zadanie #@TaskNumber</h2>
+        </header>
+        @if (!confirming)
+        {
+            <div class="modal-body">
+                <p class="eyebrow">Defekt należy do kategorii*</p>
+                <div class="categories">
+                    @foreach (var answer in DefectCategories.All)
+                    {
+                        <label class="check" title="@answer.Hint">
+                            <input type="checkbox" checked="@selected.Contains(answer.Number)"
+                                   @onchange="e => Toggle(answer.Number, e)" />
+                            @answer.Content
+                        </label>
+                    }
+                </div>
+                <Alert Text="@message" />
+            </div>
+            <div class="modal-actions">
+                <button data-escape @onclick="OnCancel">Anuluj</button>
+                <button class="primary" @onclick="Submit">ZATWIERDŹ</button>
+            </div>
+        }
+        else
+        {
+            <div class="modal-body">
+                <p class="warning"><Icon Name="triangle-alert" Size="16" />
+                    <span>UWAGA! Po zatwierdzeniu nie można wrócić do zadania. Czy chcesz kontynuować?</span></p>
+            </div>
+            <div class="modal-actions">
+                <button data-escape @onclick="() => confirming = false">Nie</button>
+                <button class="primary" @onclick="ConfirmAsync">Tak</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public uint TaskNumber { get; set; }
+    [Parameter] public EventCallback<IReadOnlyList<uint>> OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private readonly SortedSet<uint> selected = new();
+    private ElementReference dialog;
+
+    // Fokus zostaje w oknie, Escape = Anuluj/Nie (panbug.modal w app.js).
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JS.InvokeVoidAsync("panbug.modal.open", dialog);
+    }
+
+    public async ValueTask DisposeAsync() => await JS.InvokeVoidAsync("panbug.modal.close");
+
+    private bool confirming;
+    private string? message;
+
+    private void Toggle(uint number, ChangeEventArgs e)
+    {
+        if (e.Value is true) selected.Add(number);
+        else selected.Remove(number);
+    }
+
+    private void Submit()
+    {
+        if (selected.Count == 0)
+        {
+            message = "Musisz wybrać przynajmniej jedną kategorię.";
+            return;
+        }
+        message = null;
+        confirming = true;
+    }
+
+    private Task ConfirmAsync() => OnConfirm.InvokeAsync(selected.ToArray());
+}

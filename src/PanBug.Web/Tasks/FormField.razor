@@ -1,0 +1,19 @@
+@using PanBug.Domain.Tasks.Delivery
+
+@* Pole formularza dostawy: etykieta powiązana z polem atrybutem for i opis błędu pod polem. *@
+<div class="field">
+    <label for="@Sim.LabelTarget(Kind)" @onclick="() => Sim.LabelClicked(Kind)">@Label</label>
+    @ChildContent
+    @if (Error is not null && Sim.DescribesErrorsWithText)
+    {
+        <p class="field-error" id="@(DeliverySimulationBase.FieldId(Kind) + "-error")">@Error</p>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public DeliveryField Kind { get; set; }
+    [Parameter, EditorRequired] public DeliverySimulationBase Sim { get; set; } = default!;
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

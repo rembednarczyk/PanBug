@@ -1,0 +1,15 @@
+# Blueprint Render: PanBug jako strona statyczna (Blazor WebAssembly).
+# Wdrożenie: Render Dashboard -> New -> Blueprint -> wskaż to repozytorium.
+services:
+  - type: web
+    name: panbug
+    runtime: static
+    # Adres w metadanych (Open Graph, canonical) bierze się z RENDER_EXTERNAL_URL.
+    # Przy własnej domenie dodaj zmienną SITE_URL, np. https://panbug.pl/
+    buildCommand: ./build-static.sh
+    staticPublishPath: ./publish/wwwroot
+    routes:
+      # Routing po stronie przeglądarki: nieistniejące ścieżki (np. /gra) trafiają do aplikacji.
+      - type: rewrite
+        source: /*
+        destination: /index.html

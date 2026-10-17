@@ -1,0 +1,18 @@
+<Router AppAssembly="typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Nie znaleziono · PanBug</PageTitle>
+        <LayoutView Layout="typeof(MainLayout)">
+            <section class="card narrow">
+                <div class="card-body empty">
+                    <span class="icon-chip"><Icon Name="circle-alert" Size="20" /></span>
+                    <h1>Nie znaleziono strony</h1>
+                    <a class="button" href=""><Icon Name="house" Size="14" />Wróć na stronę główną</a>
+                </div>
+            </section>
+        </LayoutView>
+    </NotFound>
+</Router>

@@ -1,0 +1,57 @@
+# Buduje PanBug i publikuje na GitHub Pages.
+# Wymaga jednorazowego ustawienia: Settings -> Pages -> Source: "GitHub Actions".
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Nowy push do PR przerywa poprzednie sprawdzenie; wdrożenia z main nie są przerywane w połowie
+# (zalecenie GitHub Pages).
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Testy
+        run: dotnet test PanBug.sln -c Release
+
+      - name: Budowanie strony
+        run: ./build-static.sh
+        env:
+          # Strona projektu jest pod adresem https://<użytkownik>.github.io/<repozytorium>/
+          BASE_PATH: /${{ github.event.repository.name }}/
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish/wwwroot
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    # Uprawnienia do publikacji tylko w jobie wdrożenia (nie w buildzie i nie dla PR).
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

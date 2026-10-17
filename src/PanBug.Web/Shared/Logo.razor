@@ -1,0 +1,22 @@
+@* Znak aplikacji: zielony kafelek z połyskiem i ciemną ikoną "bug" z Lucide (kształt jak Logo w PortfolioCogitator, kolory PanBug). *@
+<svg class="logo @Class" width="@Size" height="@Size" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+     aria-hidden="true" focusable="false">
+    <defs>
+        <radialGradient id="@sheenId" cx="0.3" cy="0.2" r="0.9">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.28" />
+            <stop offset="0.6" stop-color="#ffffff" stop-opacity="0" />
+        </radialGradient>
+    </defs>
+    <rect width="32" height="32" rx="8" fill="#23c87c" />
+    <rect width="32" height="32" rx="8" fill="url(#@sheenId)" />
+    <g transform="translate(7 7) scale(0.75)" fill="none" stroke="#111111" stroke-width="2.5"
+       stroke-linecap="round" stroke-linejoin="round">@((MarkupString)LucideIcons.Shape("bug"))</g>
+</svg>
+
+@code {
+    private static int counter;
+    private readonly string sheenId = $"logo-sheen-{Interlocked.Increment(ref counter)}";
+
+    [Parameter] public int Size { get; set; } = 32;
+    [Parameter] public string? Class { get; set; }
+}

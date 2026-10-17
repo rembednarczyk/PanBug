@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- Źródło ikon PNG (apple-touch-icon, icon-192, icon-512, icon-maskable-512). Parametry w adresie: ?size=512&maskable=1 -->
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; background: transparent; }
+  svg { display: block; }
+</style></head><body>
+<script>
+  const q = new URLSearchParams(location.search);
+  const size = Number(q.get('size') || 512), maskable = q.get('maskable') === '1', square = q.get('square') === '1';
+  // Maskable: pełne tło, ikona w strefie bezpiecznej (80%). Square: pełny kwadrat (iOS sam zaokrągla rogi).
+  const rx = maskable || square ? 0 : 8;
+  const scale = maskable ? 0.54 : 0.75, offset = (32 - 24 * scale) / 2;
+  document.body.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 32 32"><defs><radialGradient id="s" cx="0.3" cy="0.2" r="0.9"><stop offset="0" stop-color="#fff" stop-opacity="0.28"/><stop offset="0.6" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    <rect width="32" height="32" rx="${rx}" fill="#23c87c"/><rect width="32" height="32" rx="${rx}" fill="url(#s)"/>
+    <g transform="translate(${offset} ${offset}) scale(${scale})" fill="none" stroke="#111111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20v-9"/><path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z"/><path d="M14.12 3.88 16 2"/><path d="M21 21a4 4 0 0 0-3.81-4"/><path d="M21 5a4 4 0 0 1-3.55 3.97"/><path d="M22 13h-4"/><path d="M3 21a4 4 0 0 1 3.81-4"/><path d="M3 5a4 4 0 0 0 3.55 3.97"/><path d="M6 13H2"/><path d="m8 2 1.88 1.88"/><path d="M9 7.13V6a3 3 0 1 1 6 0v1.13"/></g></svg>`;
+</script>
+</body></html>

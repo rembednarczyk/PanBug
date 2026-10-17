@@ -1,0 +1,90 @@
+@inherits TaskComponentBase<ParcelSimulationBase>
+@using PanBug.Domain.Tasks.Parcel
+
+<div class="split">
+    <section class="form-stack">
+        <h3>Nadaj paczkę</h3>
+        <div class="row-form">
+            <label>Wysokość (cm)*
+                <input class="num short" inputmode="numeric" data-filter="digits" data-max="3" @bind="height" />
+            </label>
+            <label>Szerokość (cm)*
+                <input class="num short" inputmode="numeric" data-filter="digits" data-max="3" @bind="width" />
+            </label>
+            <label>Głębokość (cm)*
+                <input class="num short" inputmode="numeric" data-filter="digits" data-max="3" @bind="depth" />
+            </label>
+        </div>
+        <label>Waga (kg)*
+            <input class="num short" inputmode="decimal" data-filter="amount" data-max="6" data-sep=","
+                   @bind="weight" />
+        </label>
+        <label>Telefon odbiorcy*
+            <input type="tel" maxlength="20" placeholder="+48 600 000 000" @bind="phone" />
+        </label>
+        <Alert Text="@Message" Error="MessageIsError" />
+        <button class="primary" @onclick="Send">Nadaj paczkę</button>
+    </section>
+
+    <section class="form-stack">
+        <h3>Odbierz paczkę</h3>
+        <label>Telefon odbiorcy*
+            <input type="tel" maxlength="20" placeholder="+48 600 000 000" @bind="collectPhone" />
+        </label>
+        <label>Kod odbioru*
+            <input class="mono short" inputmode="numeric" data-filter="digits" data-max="6" @bind="collectCode" />
+        </label>
+        <Alert Text="@collectMessage" Error="collectIsError" />
+        <button class="primary" @onclick="Collect">Otwórz skrytkę</button>
+    </section>
+</div>
+
+@if (Sim.Parcels.Count > 0)
+{
+    <h3>Powiadomienia SMS dla odbiorców</h3>
+    <div class="table-wrap">
+        <table class="grid">
+            <thead><tr><th>Telefon</th><th class="r">Skrytka</th><th>Kod odbioru</th><th>Status</th></tr></thead>
+            <tbody>
+                @foreach (var parcel in Sim.Parcels)
+                {
+                    <tr>
+                        <td class="mono">@PhoneNumber.Format(parcel.Phone)</td>
+                        <td class="r">@parcel.Locker</td>
+                        <td class="mono">@parcel.Code</td>
+                        <td>@(parcel.Collected ? "odebrana" : "czeka w skrytce")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private string height = string.Empty;
+    private string width = string.Empty;
+    private string depth = string.Empty;
+    private string weight = string.Empty;
+    private string phone = string.Empty;
+    private string collectPhone = string.Empty;
+    private string collectCode = string.Empty;
+    private string? collectMessage;
+    private bool collectIsError = true;
+
+    private void Send()
+    {
+        var result = Sim.Send(new ParcelInput(height, width, depth, weight, phone));
+        ShowResult(result);
+        if (result.Success)
+            height = width = depth = weight = phone = string.Empty;
+    }
+
+    private void Collect()
+    {
+        var result = Sim.Collect(collectPhone, collectCode);
+        collectMessage = result.Message;
+        collectIsError = !result.Success;
+        if (result.Success)
+            collectCode = string.Empty;
+    }
+}

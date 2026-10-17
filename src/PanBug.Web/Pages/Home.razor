@@ -1,0 +1,103 @@
+@page "/"
+@inject GameSession Session
+@inject IResultStore Results
+@inject NavigationManager Nav
+@using PanBug.Domain.Defects
+
+<PageTitle>PanBug: trening testowania oprogramowania</PageTitle>
+
+<section class="hero">
+    <div class="card hero-main">
+        <span class="chip"><Icon Name="bug" Size="12" />Trening testowania</span>
+        <h1>ZACZYNAMY?</h1>
+        <p class="hero-lead">24 zadania w ośmiu aplikacjach, w każdym ukryty defekt. Znajdź go, odtwórz i zgłoś z właściwą kategorią.
+           Punkty dostajesz tylko za defekt, który uda Ci się wywołać.</p>
+        <div class="stat-grid boxed">
+            <div class="stat"><span class="stat-label">Zadania</span><span class="stat-value">@TaskCatalog.TaskCount</span></div>
+            <div class="stat"><span class="stat-label">Kategorie defektów</span><span class="stat-value">@DefectCategories.All.Count</span></div>
+            <div class="stat"><span class="stat-label">Punkty do zdobycia</span><span class="stat-value score">@DefectCatalog.MaxPoints</span></div>
+        </div>
+        <div class="button-row">
+            @if (Session.HasActiveGame)
+            {
+                <button class="primary big" @onclick="Continue"><Icon Name="play" Size="16" />KONTYNUUJ GRĘ</button>
+                <button class="big" @onclick="StartNew"><Icon Name="rotate-ccw" Size="16" />Nowa gra</button>
+            }
+            else
+            {
+                <button class="primary big" @onclick="StartNew"><Icon Name="play" Size="16" />ROZPOCZNIJ</button>
+            }
+        </div>
+        <p class="hero-note"><Icon Name="hard-drive" Size="14" />Gra działa w całości w przeglądarce. Wyniki zapisują się tylko na tym urządzeniu.</p>
+    </div>
+
+    <aside class="card scores">
+        <header class="card-head">
+            <h2><Icon Name="trophy" Size="16" />Twoje wyniki</h2>
+            @if (history is { Count: > 0 })
+            {
+                <span class="chip slate">@history.Count @Utils.PluralPl(history.Count, "gra", "gry", "gier")</span>
+            }
+        </header>
+        <div class="card-body">
+            @if (history is null)
+            {
+                <p class="muted">Wczytywanie...</p>
+            }
+            else if (best is null)
+            {
+                <div class="empty">
+                    <span class="icon-chip"><Icon Name="history" Size="20" /></span>
+                    <strong>Nie masz jeszcze ukończonej gry.</strong>
+                    <span class="muted">Najlepszy wynik i historia pojawią się tutaj.</span>
+                </div>
+            }
+            else
+            {
+                <div class="best">
+                    <div class="stat">
+                        <span class="stat-label">Najlepszy wynik</span>
+                        <span class="best-points">@best.Points</span>
+                    </div>
+                    <p class="muted">@Utils.PluralPl(best.Points, "punkt", "punkty", "punktów") z @best.MaxPoints<br />
+                        czas @Utils.FormatDuration(best.Duration)</p>
+                </div>
+                <div class="table-wrap">
+                    <table class="grid compact">
+                        <thead><tr><th>Data</th><th class="r">Punkty</th><th class="r">Zadania</th><th class="r">Czas</th></tr></thead>
+                        <tbody>
+                            @foreach (var game in history)
+                            {
+                                <tr>
+                                    <td>@game.FinishedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td class="r">@game.Points/@game.MaxPoints</td>
+                                    <td class="r">@game.CompletedTasks/@TaskCatalog.TaskCount</td>
+                                    <td class="r">@Utils.FormatDuration(game.Duration)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </aside>
+</section>
+
+@code {
+    private GameRecord? best;
+    private IReadOnlyList<GameRecord>? history;
+
+    protected override async Task OnInitializedAsync()
+    {
+        best = await Results.GetBestAsync();
+        history = await Results.GetHistoryAsync();
+    }
+
+    private void StartNew()
+    {
+        Session.StartGame();
+        Nav.NavigateTo("gra");
+    }
+
+    private void Continue() => Nav.NavigateTo("gra");
+}

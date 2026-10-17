@@ -1,0 +1,36 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title"
+         tabindex="-1" @ref="dialog">
+        <header class="card-head md">
+            <h2 id="confirm-title"><Icon Name="circle-alert" Size="16" />@Title</h2>
+        </header>
+        <div class="modal-body">
+            <p>@Text</p>
+        </div>
+        <div class="modal-actions">
+            <button data-escape @onclick="OnNo">Nie</button>
+            <button class="primary" @onclick="OnYes">Tak</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnYes { get; set; }
+    [Parameter] public EventCallback OnNo { get; set; }
+
+    private ElementReference dialog;
+
+    // Fokus zostaje w oknie, Escape = Nie (panbug.modal w app.js).
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JS.InvokeVoidAsync("panbug.modal.open", dialog);
+    }
+
+    public async ValueTask DisposeAsync() => await JS.InvokeVoidAsync("panbug.modal.close");
+}

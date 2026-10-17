@@ -1,0 +1,18 @@
+@inherits LayoutComponentBase
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="" aria-label="PanBug - strona główna">
+            <Logo />
+            <span class="brand-name">Pan<span>Bug</span></span>
+        </a>
+        <nav class="topnav" aria-label="Nawigacja">
+            <NavLink href="" Match="NavLinkMatch.All"><Icon Name="house" Size="14" />Start</NavLink>
+            <NavLink href="pomoc"><Icon Name="circle-help" Size="14" />Pomoc</NavLink>
+            <ThemeToggle />
+        </nav>
+    </div>
+</header>
+<main class="page">
+    @Body
+</main>

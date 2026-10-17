@@ -1,0 +1,22 @@
+@* Przełącznik jasny/ciemny. Motyw ustawia theme-init.js przed pierwszym malowaniem; tu tylko zmiana i zapis. *@
+@inject IJSRuntime JS
+
+<button type="button" class="icon-button" @onclick="ToggleAsync"
+        aria-label="@(dark ? "Włącz jasny motyw" : "Włącz ciemny motyw")"
+        title="@(dark ? "Jasny motyw" : "Ciemny motyw")">
+    <Icon Name="@(dark ? "sun" : "moon")" Size="18" />
+</button>
+
+@code {
+    private bool dark;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+        dark = await JS.InvokeAsync<bool>("panbug.theme.isDark");
+        StateHasChanged();
+    }
+
+    private async Task ToggleAsync() => dark = await JS.InvokeAsync<bool>("panbug.theme.toggle");
+}

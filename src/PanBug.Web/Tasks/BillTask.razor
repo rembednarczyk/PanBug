@@ -1,0 +1,53 @@
+@inherits TaskComponentBase<BillSimulationBase>
+@using PanBug.Domain.Tasks.Bill
+
+<div class="form-stack">
+    <label>Kwota rachunku (zł)*
+        <input class="num" inputmode="decimal" maxlength="15" placeholder="np. 1 250,50" @bind="amount" />
+    </label>
+    <label>Liczba osób*
+        <input class="num short" inputmode="numeric" data-filter="digits" data-max="2" @bind="persons" />
+    </label>
+    <label>Kod rabatowy
+        <input class="mono short" maxlength="20" autocomplete="off" @bind="code" />
+    </label>
+    <Alert Text="@Message" Error="MessageIsError" />
+    <button class="primary" @onclick="Calculate">Podziel rachunek</button>
+</div>
+
+@if (Sim.Result is { } result)
+{
+    <dl class="details result-summary">
+        <dt>Kwota rachunku</dt><dd>@PolishNumber.Money(result.Amount)</dd>
+        @if (result.Code is not null)
+        {
+            <dt>Rabat @result.Code (@result.DiscountPercent%)</dt><dd>−@PolishNumber.Money(result.Discount)</dd>
+        }
+        <dt>Do zapłaty</dt><dd class="output">@PolishNumber.Money(result.ToPay)</dd>
+    </dl>
+    <div class="table-wrap">
+        <table class="grid compact">
+            <thead><tr><th>Osoba</th><th class="r">Kwota</th></tr></thead>
+            <tbody>
+                @for (int i = 0; i < result.Shares.Count; i++)
+                {
+                    <tr><td>Osoba @(i + 1)</td><td class="r">@PolishNumber.Money(result.Shares[i])</td></tr>
+                }
+            </tbody>
+            <tfoot><tr><td>Razem</td><td class="r">@PolishNumber.Money(result.SharesTotal)</td></tr></tfoot>
+        </table>
+    </div>
+}
+
+@code {
+    private string amount = string.Empty;
+    private string persons = string.Empty;
+    private string code = string.Empty;
+
+    private void Calculate()
+    {
+        var result = Sim.Calculate(amount, persons, code);
+        if (result.Success) ClearMessage();
+        else ShowResult(result);
+    }
+}
