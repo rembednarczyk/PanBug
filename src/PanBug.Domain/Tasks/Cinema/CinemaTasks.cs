@@ -10,18 +10,18 @@ public sealed class Task01Cinema : CinemaSimulationBase
     protected override bool IsReduced(int age) => age < ReducedMaxAge;
 }
 
-/// <summary>Zadanie 2: odznaczenie miejsca nie usuwa jego biletu, więc ponowne zaznaczenie liczy miejsce dwa razy.</summary>
-public sealed class Task02Cinema : CinemaSimulationBase
+/// <summary>Zadanie 9: odznaczenie miejsca nie usuwa jego biletu, więc ponowne zaznaczenie liczy miejsce dwa razy.</summary>
+public sealed class Task09Cinema : CinemaSimulationBase
 {
-    public Task02Cinema(DateOnly? today = null) : base(2, PointValue.Two, today) { }
+    public Task09Cinema(DateOnly? today = null) : base(9, PointValue.Two, today) { }
 
     protected override void OnSeatDeselected(Seat seat) { }
 }
 
-/// <summary>Zadanie 3: seans po północy trafia na listę poprzedniego dnia ("doba kinowa" do 6:00).</summary>
-public sealed class Task03Cinema : CinemaSimulationBase
+/// <summary>Zadanie 18: seans po północy trafia na listę poprzedniego dnia ("doba kinowa" do 6:00).</summary>
+public sealed class Task18Cinema : CinemaSimulationBase
 {
-    public Task03Cinema(DateOnly? today = null) : base(3, PointValue.Three, today) { }
+    public Task18Cinema(DateOnly? today = null) : base(18, PointValue.Three, today) { }
 
     protected override DateOnly ListingDayOf(Showing showing) =>
         DateOnly.FromDateTime(showing.Start.AddHours(-6));

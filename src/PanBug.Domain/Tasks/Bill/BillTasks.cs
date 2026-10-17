@@ -3,19 +3,19 @@ using PanBug.Domain.Model;
 
 namespace PanBug.Domain.Tasks.Bill;
 
-/// <summary>Zadanie 19: każda osoba płaci zaokrągloną średnią, więc grosz reszty ginie albo pojawia się nadpłata.</summary>
-public sealed class Task19Bill : BillSimulationBase
+/// <summary>Zadanie 4: każda osoba płaci zaokrągloną średnią, więc grosz reszty ginie albo pojawia się nadpłata.</summary>
+public sealed class Task04Bill : BillSimulationBase
 {
-    public Task19Bill() : base(19, PointValue.One) { }
+    public Task04Bill() : base(4, PointValue.One) { }
 
     protected override IReadOnlyList<decimal> Split(decimal total, int persons) =>
         Enumerable.Repeat(Math.Round(total / persons, 2, MidpointRounding.AwayFromZero), persons).ToList();
 }
 
-/// <summary>Zadanie 20: wykorzystany kod jest zapamiętany z wielkością liter, więc ten sam kod małymi literami działa drugi raz.</summary>
-public sealed class Task20Bill : BillSimulationBase
+/// <summary>Zadanie 11: wykorzystany kod jest zapamiętany z wielkością liter, więc ten sam kod małymi literami działa drugi raz.</summary>
+public sealed class Task11Bill : BillSimulationBase
 {
-    public Task20Bill() : base(20, PointValue.Two) { }
+    public Task11Bill() : base(11, PointValue.Two) { }
 
     protected override string UsedCodeKey(string code) => code.Trim();
 }

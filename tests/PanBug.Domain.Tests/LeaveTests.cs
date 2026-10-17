@@ -14,9 +14,9 @@ public class LeaveTests
     }
 
     [Fact]
-    public void Task10_weekend_days_are_counted()
+    public void Task03_weekend_days_are_counted()
     {
-        var sim = new Task10Leave(Today);
+        var sim = new Task03Leave(Today);
         Assert.True(sim.Submit("2026-11-02", "2026-11-08").Success); // pon.-niedz.
         Assert.Equal(7, sim.Used(2026));
         Assert.True(sim.DefectShown);
@@ -33,9 +33,9 @@ public class LeaveTests
     }
 
     [Fact]
-    public void Task11_year_end_request_takes_all_days_from_first_year()
+    public void Task16_year_end_request_takes_all_days_from_first_year()
     {
-        var sim = new Task11Leave(Today);
+        var sim = new Task16Leave(Today);
         Assert.True(sim.Submit("2026-12-28", "2027-01-08").Success);
         Assert.Equal(10, sim.Used(2026));
         Assert.Equal(0, sim.Used(2027));
@@ -53,9 +53,9 @@ public class LeaveTests
     }
 
     [Fact]
-    public void Task12_cancelling_approved_request_keeps_days_reserved()
+    public void Task22_cancelling_approved_request_keeps_days_reserved()
     {
-        var sim = new Task12Leave(Today);
+        var sim = new Task22Leave(Today);
         sim.Submit("2026-11-02", "2026-11-06");
         var request = sim.Requests[0];
         sim.Approve(request);
@@ -66,9 +66,9 @@ public class LeaveTests
     }
 
     [Fact]
-    public void Task12_cancelling_pending_request_returns_days()
+    public void Task22_cancelling_pending_request_returns_days()
     {
-        var sim = new Task12Leave(Today);
+        var sim = new Task22Leave(Today);
         sim.Submit("2026-11-02", "2026-11-06");
         sim.Cancel(sim.Requests[0]);
         Assert.Equal(0, sim.Used(2026));

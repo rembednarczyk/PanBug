@@ -35,7 +35,7 @@ public class ScoringTests
         var report = SampleReport(new ReportTask(2)
         {
             IsCompleted = true,
-            AnswerNumbers = new uint[] { 1 }, // zadanie 2 to kategorie 4 i 5
+            AnswerNumbers = new uint[] { 3 }, // zadanie 2 to tylko kategoria 1
             Actions = new uint[] { TaskBase.DefectMarker },
         });
 
@@ -48,7 +48,7 @@ public class ScoringTests
         var report = SampleReport(new ReportTask(2)
         {
             IsCompleted = true,
-            AnswerNumbers = new uint[] { 4 },
+            AnswerNumbers = new uint[] { 1 }, // trafna kategoria, ale defekt nie odtworzony
             Actions = Array.Empty<uint>(),
         });
 
@@ -58,7 +58,7 @@ public class ScoringTests
     [Fact]
     public void Scoring_partial_credit_option()
     {
-        var report = SampleReport(new ReportTask(18) // 4 punkty
+        var report = SampleReport(new ReportTask(23) // 4 punkty
         {
             IsCompleted = true,
             AnswerNumbers = new uint[] { 1 }, // zła kategoria
@@ -67,6 +67,25 @@ public class ScoringTests
 
         var engine = new StandardScoringEngine(new ScoringOptions { PartialCreditForReproductionOnly = true });
         Assert.Equal(2, engine.Score(report).Points); // połowa z 4
+    }
+
+    [Fact]
+    public void Tasks_of_one_app_are_spread_and_never_adjacent()
+    {
+        // Zadania jednej aplikacji dzielą opis wymagań, więc nie mogą stać obok siebie
+        // a gra zaczyna się od kina.
+        var apps = TaskCatalog.CreateAll().Select(t => t.GetType().BaseType!).ToList();
+
+        Assert.Equal(typeof(PanBug.Domain.Tasks.Cinema.CinemaSimulationBase), apps[0]);
+        Assert.All(apps.GroupBy(a => a), g => Assert.Equal(3, g.Count()));
+        for (var i = 1; i < apps.Count; i++)
+            Assert.NotEqual(apps[i - 1], apps[i]);
+        foreach (var group in apps.Select((a, i) => (a, i)).GroupBy(x => x.a))
+        {
+            var positions = group.Select(x => x.i).ToList();
+            Assert.True(positions.Zip(positions.Skip(1)).All(p => p.Second - p.First >= 4),
+                $"{group.Key.Name}: zadania {string.Join(", ", positions.Select(i => i + 1))} są za blisko siebie.");
+        }
     }
 
     [Fact]

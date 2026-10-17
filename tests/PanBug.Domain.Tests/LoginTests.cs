@@ -26,11 +26,11 @@ public class LoginTests
     }
 
     [Fact]
-    public void Task13_reset_message_reveals_whether_account_exists()
+    public void Task05_reset_message_reveals_whether_account_exists()
     {
-        var sim = new Task13Login();
+        var sim = new Task05Login();
         var known = sim.RequestReset("tester@example.pl");
-        var unknown = new Task13Login().RequestReset("nikt@example.pl");
+        var unknown = new Task05Login().RequestReset("nikt@example.pl");
         Assert.NotEqual(known.Message, unknown.Message);
         Assert.True(sim.DefectShown);
     }
@@ -45,9 +45,9 @@ public class LoginTests
     }
 
     [Fact]
-    public void Task14_capitalised_login_bypasses_lock()
+    public void Task12_capitalised_login_bypasses_lock()
     {
-        var sim = new Task14Login();
+        var sim = new Task12Login();
         LockAndRetryWithCapital(sim);
         Assert.Equal(LoginScreen.LoggedIn, sim.Screen);
         Assert.True(sim.DefectShown);
@@ -66,9 +66,9 @@ public class LoginTests
     }
 
     [Fact]
-    public void Task15_password_stays_in_form_after_logout()
+    public void Task19_password_stays_in_form_after_logout()
     {
-        var sim = new Task15Login();
+        var sim = new Task19Login();
         Assert.True(Attempt(sim, "tester", LoginSimulationBase.AccountPassword));
         sim.Logout();
         Assert.Equal(LoginSimulationBase.AccountPassword, sim.PasswordText);

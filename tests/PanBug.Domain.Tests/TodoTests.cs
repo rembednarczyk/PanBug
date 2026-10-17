@@ -19,9 +19,9 @@ public class TodoTests
 
     [Theory]
     [MemberData(nameof(EveryDay))]
-    public void Task16_task_due_today_is_listed_as_overdue(DateOnly today)
+    public void Task10_task_due_today_is_listed_as_overdue(DateOnly today)
     {
-        var sim = new Task16Todo(today);
+        var sim = new Task10Todo(today);
         sim.SetFilter(TodoFilter.Overdue);
         Assert.Contains(sim.Visible, i => i.Due == today);
         Assert.True(sim.DefectShown);
@@ -41,9 +41,9 @@ public class TodoTests
 
     [Theory]
     [MemberData(nameof(EveryDay))]
-    public void Task17_sort_orders_by_day_of_month(DateOnly today)
+    public void Task15_sort_orders_by_day_of_month(DateOnly today)
     {
-        var sim = new Task17Todo(today);
+        var sim = new Task15Todo(today);
         sim.SortByDue();
         Assert.True(sim.DefectShown);
     }
@@ -60,9 +60,9 @@ public class TodoTests
 
     [Theory]
     [MemberData(nameof(EveryDay))]
-    public void Task18_delete_in_filtered_view_removes_other_task(DateOnly today)
+    public void Task23_delete_in_filtered_view_removes_other_task(DateOnly today)
     {
-        var sim = new Task18Todo(today);
+        var sim = new Task23Todo(today);
         sim.SetFilter(TodoFilter.Overdue);
         var clicked = sim.Visible[0];
         sim.DeleteVisibleAt(0);
