@@ -11,18 +11,18 @@ public sealed class Task07Loan : LoanSimulationBase
         Annuity(amount, annualRatePercent, months);
 }
 
-/// <summary>Zadanie 8: ostatnia rata nie wyrównuje groszy z zaokrągleń, więc kapitał nie domyka się do zera.</summary>
-public sealed class Task08Loan : LoanSimulationBase
+/// <summary>Zadanie 14: ostatnia rata nie wyrównuje groszy z zaokrągleń, więc kapitał nie domyka się do zera.</summary>
+public sealed class Task14Loan : LoanSimulationBase
 {
-    public Task08Loan() : base(8, PointValue.Three) { }
+    public Task14Loan() : base(14, PointValue.Three) { }
 
     protected override bool AdjustsLastInstallment => false;
 }
 
-/// <summary>Zadanie 9: zmiana jednostki okresu zmienia tylko etykietę, wartość w polu zostaje bez przeliczenia.</summary>
-public sealed class Task09Loan : LoanSimulationBase
+/// <summary>Zadanie 20: zmiana jednostki okresu zmienia tylko etykietę, wartość w polu zostaje bez przeliczenia.</summary>
+public sealed class Task20Loan : LoanSimulationBase
 {
-    public Task09Loan() : base(9, PointValue.Two) { }
+    public Task20Loan() : base(20, PointValue.Two) { }
 
     protected override bool ConvertsPeriodOnUnitChange => false;
 }

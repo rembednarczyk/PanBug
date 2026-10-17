@@ -49,9 +49,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task02_reselected_seat_shows_two_tickets()
+    public void Task09_reselected_seat_shows_two_tickets()
     {
-        var sim = new Task02Cinema();
+        var sim = new Task09Cinema();
         var cut = Cinema(sim);
         Click(cut, "Wybierz miejsca");
         for (int i = 0; i < 3; i++)
@@ -65,9 +65,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task03_night_showing_opens_with_next_day_date()
+    public void Task18_night_showing_opens_with_next_day_date()
     {
-        var sim = new Task03Cinema();
+        var sim = new Task18Cinema();
         var cut = Cinema(sim);
         var row = cut.FindAll("tbody tr").First(r => r.TextContent.Contains("00:30"));
         row.QuerySelector("button")!.Click();
@@ -101,9 +101,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task04_parcel_at_height_limit_is_rejected()
+    public void Task02_parcel_at_height_limit_is_rejected()
     {
-        var sim = new Task04Parcel();
+        var sim = new Task02Parcel();
         var cut = Parcel(sim);
         Send(cut, "64", "600000000");
         Assert.Contains("Wysokość musi", cut.Markup);
@@ -111,9 +111,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task05_code_with_leading_zero_is_refused()
+    public void Task06_code_with_leading_zero_is_refused()
     {
-        var sim = new Task05Parcel();
+        var sim = new Task06Parcel();
         var cut = Parcel(sim);
         Send(cut, "30", "600000000");
         Assert.Contains("048213", cut.Find("table.grid").TextContent);
@@ -125,9 +125,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task06_phone_from_placeholder_is_rejected()
+    public void Task13_phone_from_placeholder_is_rejected()
     {
-        var sim = new Task06Parcel();
+        var sim = new Task13Parcel();
         var cut = Parcel(sim);
         Assert.Equal("+48 600 000 000", Input(cut, 4).GetAttribute("placeholder"));
         Send(cut, "30", "+48 600 000 000");
@@ -156,9 +156,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task08_schedule_does_not_end_at_zero()
+    public void Task14_schedule_does_not_end_at_zero()
     {
-        var sim = new Task08Loan();
+        var sim = new Task14Loan();
         var cut = Loan(sim, "10 000", "7,5", "12");
         Click(cut, "Oblicz ratę");
         Assert.DoesNotContain("0,00 zł", cut.FindAll("tbody tr")[^1].Children[^1].TextContent);
@@ -166,9 +166,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task09_unit_change_keeps_months_value()
+    public void Task20_unit_change_keeps_months_value()
     {
-        var sim = new Task09Loan();
+        var sim = new Task20Loan();
         var cut = Loan(sim, "10 000", "6", "24");
         cut.Find("select").Change(nameof(PeriodUnit.Years));
         Assert.Equal("24", Input(cut, 2).GetAttribute("value"));
@@ -206,9 +206,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task10_weekend_is_counted_as_leave()
+    public void Task03_weekend_is_counted_as_leave()
     {
-        var sim = new Task10Leave();
+        var sim = new Task03Leave();
         var monday = NextYearMonday();
         Leave(sim, monday, monday.AddDays(6));
         Assert.Equal(7, sim.Used(Today.Year + 1));
@@ -216,18 +216,18 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task11_year_end_request_takes_days_from_one_pool()
+    public void Task16_year_end_request_takes_days_from_one_pool()
     {
-        var sim = new Task11Leave();
+        var sim = new Task16Leave();
         var cut = Leave(sim, new DateOnly(Today.Year, 12, 28), new DateOnly(Today.Year + 1, 1, 8));
         Assert.DoesNotContain($"{Today.Year + 1}:", cut.FindAll("table.grid")[1].TextContent);
         Assert.True(Shown(sim));
     }
 
     [Fact]
-    public void Task12_cancelled_approved_request_keeps_days()
+    public void Task22_cancelled_approved_request_keeps_days()
     {
-        var sim = new Task12Leave();
+        var sim = new Task22Leave();
         var monday = NextYearMonday();
         var cut = Leave(sim, monday, monday.AddDays(4));
         Click(cut, "Zaakceptuj");
@@ -250,9 +250,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task13_reset_reveals_existing_account()
+    public void Task05_reset_reveals_existing_account()
     {
-        var sim = new Task13Login();
+        var sim = new Task05Login();
         var cut = Login(sim);
         Click(cut, "Nie pamiętam hasła");
         Input(cut, 0).Change("nikt@example.pl");
@@ -262,9 +262,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task14_capital_letter_bypasses_lock()
+    public void Task12_capital_letter_bypasses_lock()
     {
-        var sim = new Task14Login();
+        var sim = new Task12Login();
         var cut = Login(sim);
         for (int i = 0; i < 3; i++)
             LogIn(cut, "tester", "zle");
@@ -275,9 +275,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task15_password_left_in_form_after_logout()
+    public void Task19_password_left_in_form_after_logout()
     {
-        var sim = new Task15Login();
+        var sim = new Task19Login();
         var cut = Login(sim);
         LogIn(cut, "tester", LoginSimulationBase.AccountPassword);
         Click(cut, "Wyloguj");
@@ -291,9 +291,9 @@ public class TaskViewTests : WebTestBase
         RenderComponent<TodoTask>(p => p.Add(c => c.Simulation, sim));
 
     [Fact]
-    public void Task16_task_due_today_in_overdue_filter()
+    public void Task10_task_due_today_in_overdue_filter()
     {
-        var sim = new Task16Todo();
+        var sim = new Task10Todo();
         var cut = Todo(sim);
         Click(cut, "Zaległe");
         Assert.Contains(Today.ToString("dd.MM.yyyy"), cut.Find("tbody").TextContent);
@@ -301,18 +301,18 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task17_sort_by_due_is_not_chronological()
+    public void Task15_sort_by_due_is_not_chronological()
     {
-        var sim = new Task17Todo();
+        var sim = new Task15Todo();
         var cut = Todo(sim);
         Click(cut, "Sortuj po terminie");
         Assert.True(Shown(sim));
     }
 
     [Fact]
-    public void Task18_delete_in_filter_removes_other_row()
+    public void Task23_delete_in_filter_removes_other_row()
     {
-        var sim = new Task18Todo();
+        var sim = new Task23Todo();
         var cut = Todo(sim);
         Click(cut, "Zaległe");
         var title = cut.Find("tbody tr td:nth-child(2)").TextContent;
@@ -334,18 +334,18 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task19_shares_sum_differs_from_total()
+    public void Task04_shares_sum_differs_from_total()
     {
-        var sim = new Task19Bill();
+        var sim = new Task04Bill();
         var cut = Bill(sim, "100", "3");
         Assert.Contains("99,99 zł", cut.Find("tfoot").TextContent);
         Assert.True(Shown(sim));
     }
 
     [Fact]
-    public void Task20_lower_case_code_reused()
+    public void Task11_lower_case_code_reused()
     {
-        var sim = new Task20Bill();
+        var sim = new Task11Bill();
         var cut = Bill(sim, "200", "2", "TESTER10");
         Input(cut, 2).Change("tester10");
         Click(cut, "Podziel rachunek");
@@ -371,9 +371,9 @@ public class TaskViewTests : WebTestBase
         cut.Find("#" + DeliverySimulationBase.FieldId(field));
 
     [Fact]
-    public void Task22_errors_have_no_text()
+    public void Task08_errors_have_no_text()
     {
-        var sim = new Task22Delivery();
+        var sim = new Task08Delivery();
         var cut = Delivery(sim);
         Click(cut, "Zamów");
         Assert.Empty(cut.FindAll(".field-error"));
@@ -394,9 +394,9 @@ public class TaskViewTests : WebTestBase
     }
 
     [Fact]
-    public void Task23_last_name_label_targets_first_name()
+    public void Task17_last_name_label_targets_first_name()
     {
-        var sim = new Task23Delivery();
+        var sim = new Task17Delivery();
         var cut = Delivery(sim);
         var label = cut.FindAll("label").First(l => l.TextContent.Trim() == "Nazwisko*");
         Assert.Equal(DeliverySimulationBase.FieldId(DeliveryField.FirstName), label.GetAttribute("for"));

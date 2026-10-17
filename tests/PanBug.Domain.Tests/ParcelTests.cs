@@ -15,9 +15,9 @@ public class ParcelTests
         new(height, "30", "30", "2,5", phone);
 
     [Fact]
-    public void Task04_height_equal_to_limit_is_rejected()
+    public void Task02_height_equal_to_limit_is_rejected()
     {
-        var sim = new Task04Parcel();
+        var sim = new Task02Parcel();
         Assert.False(sim.Send(Valid(height: "64")).Success);
         Assert.True(sim.DefectShown);
     }
@@ -37,9 +37,9 @@ public class ParcelTests
     }
 
     [Fact]
-    public void Task05_code_with_leading_zero_does_not_open_locker()
+    public void Task06_code_with_leading_zero_does_not_open_locker()
     {
-        var sim = new Task05Parcel();
+        var sim = new Task06Parcel();
         Assert.True(sim.Send(Valid()).Success);
         Assert.Equal("048213", sim.Parcels[0].Code);
         Assert.False(sim.Collect("600 000 000", "048213").Success);
@@ -48,9 +48,9 @@ public class ParcelTests
     }
 
     [Fact]
-    public void Task05_code_without_leading_zero_still_works()
+    public void Task06_code_without_leading_zero_still_works()
     {
-        var sim = new Task05Parcel();
+        var sim = new Task06Parcel();
         sim.Send(Valid());
         sim.Send(Valid(phone: "600000001"));
         Assert.True(sim.Collect("600000001", "731905").Success);
@@ -72,9 +72,9 @@ public class ParcelTests
     [InlineData("+48 600 000 000")]
     [InlineData("600 000 000")]
     [InlineData("+48600000000")]
-    public void Task06_phone_in_hint_format_is_rejected(string phone)
+    public void Task13_phone_in_hint_format_is_rejected(string phone)
     {
-        var sim = new Task06Parcel();
+        var sim = new Task13Parcel();
         Assert.False(sim.Send(Valid(phone: phone)).Success);
         Assert.True(sim.DefectShown);
     }
@@ -98,7 +98,7 @@ public class ParcelTests
     [InlineData("abc")]
     public void Invalid_phone_rejected_without_marker(string phone)
     {
-        var sim = new Task06Parcel();
+        var sim = new Task13Parcel();
         Assert.False(sim.Send(Valid(phone: phone)).Success);
         Assert.False(sim.DefectShown);
     }

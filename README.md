@@ -11,18 +11,20 @@ zapisują się w `localStorage` przeglądarki.
 ## Zadania
 
 Każda aplikacja ma trzy zadania. Zadania jednej aplikacji mają ten sam widok i ten sam
-opis wymagań, a różnią się defektem.
+opis wymagań, a różnią się defektem. Są rozrzucone po grze i nigdy
+nie stoją obok siebie, więc powtórzony opis nie zdradza od razu, że to ta sama aplikacja.
+Na początku są zadania za 1 punkt, na końcu najtrudniejsze.
 
-| Zadania | Aplikacja |
+| Aplikacja | Zadania |
 |---|---|
-| 1–3 | Kino: wybór seansu, plan sali, bilety z ulgą wiekową |
-| 4–6 | Automat paczkowy: nadanie paczki (wymiary, waga, telefon) i odbiór kodem |
-| 7–9 | Kalkulator raty kredytu z harmonogramem spłaty |
-| 10–12 | Planer urlopów z pulami dni na dwa lata |
-| 13–15 | Logowanie z blokadą konta i resetem hasła |
-| 16–18 | Lista zadań z terminami, filtrem zaległych i sortowaniem |
-| 19–21 | Podział rachunku w restauracji z kodami rabatowymi |
-| 22–24 | Formularz zamówienia z dostawą (walidacja i dostępność) |
+| Kino: wybór seansu, plan sali, bilety z ulgą wiekową | 1, 9, 18 |
+| Automat paczkowy: nadanie paczki (wymiary, waga, telefon) i odbiór kodem | 2, 6, 13 |
+| Kalkulator raty kredytu z harmonogramem spłaty | 7, 14, 20 |
+| Planer urlopów z pulami dni na dwa lata | 3, 16, 22 |
+| Logowanie z blokadą konta i resetem hasła | 5, 12, 19 |
+| Lista zadań z terminami, filtrem zaległych i sortowaniem | 10, 15, 23 |
+| Podział rachunku w restauracji z kodami rabatowymi | 4, 11, 21 |
+| Formularz zamówienia z dostawą (walidacja i dostępność) | 8, 17, 24 |
 
 Kategorie zgłoszenia (12) łączą techniki projektowania testów z sylabusa ISTQB
 (wartości brzegowe, klasy równoważności, reguły biznesowe, przejścia stanów) z obszarami

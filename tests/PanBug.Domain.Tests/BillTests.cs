@@ -12,9 +12,9 @@ public class BillTests
     }
 
     [Fact]
-    public void Task19_shares_do_not_add_up_to_total()
+    public void Task04_shares_do_not_add_up_to_total()
     {
-        var sim = new Task19Bill();
+        var sim = new Task04Bill();
         Assert.True(sim.Calculate("100", "3", "").Success);
         Assert.Equal(99.99m, sim.Result!.SharesTotal);
         Assert.True(sim.DefectShown);
@@ -37,9 +37,9 @@ public class BillTests
     }
 
     [Fact]
-    public void Task20_used_code_works_again_in_lower_case()
+    public void Task11_used_code_works_again_in_lower_case()
     {
-        var sim = new Task20Bill();
+        var sim = new Task11Bill();
         Assert.True(sim.Calculate("200", "2", "TESTER10").Success);
         Assert.True(sim.Calculate("200", "2", "tester10").Success);
         Assert.Equal(20m, sim.Result!.Discount);

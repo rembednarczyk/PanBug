@@ -23,7 +23,7 @@ public class CinemaTests
         Assert.True(sim.Summarize().Success);
     }
 
-    /// <summary>Kroki zadania 2: zaznacz, odznacz i ponownie zaznacz to samo miejsce.</summary>
+    /// <summary>Kroki zadania 9: zaznacz, odznacz i ponownie zaznacz to samo miejsce.</summary>
     private static void ReselectSeat(CinemaSimulationBase sim)
     {
         sim.SelectShowing(sim.ShowingsFor(Today)[0]);
@@ -35,7 +35,7 @@ public class CinemaTests
         Assert.True(sim.Summarize().Success);
     }
 
-    /// <summary>Kroki zadania 3: każdy seans z listy każdego dnia.</summary>
+    /// <summary>Kroki zadania 18: każdy seans z listy każdego dnia.</summary>
     private static void OpenEveryShowing(CinemaSimulationBase sim)
     {
         foreach (var day in sim.Days)
@@ -68,9 +68,9 @@ public class CinemaTests
     }
 
     [Fact]
-    public void Task02_reselected_seat_is_billed_twice()
+    public void Task09_reselected_seat_is_billed_twice()
     {
-        var sim = new Task02Cinema(Today);
+        var sim = new Task09Cinema(Today);
         ReselectSeat(sim);
         Assert.True(sim.DefectShown);
         Assert.Equal(2, sim.Summary!.Lines.Count);
@@ -87,9 +87,9 @@ public class CinemaTests
     }
 
     [Fact]
-    public void Task03_night_showing_listed_on_previous_day()
+    public void Task18_night_showing_listed_on_previous_day()
     {
-        var sim = new Task03Cinema(Today);
+        var sim = new Task18Cinema(Today);
         var night = sim.ShowingsFor(Today).Single(s => s.Start.Date > Today.ToDateTime(TimeOnly.MinValue));
         Assert.Equal(Today.AddDays(1), DateOnly.FromDateTime(night.Start));
         OpenEveryShowing(sim);

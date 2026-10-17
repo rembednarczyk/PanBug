@@ -23,9 +23,9 @@ public class DeliveryTests
     }
 
     [Fact]
-    public void Task22_errors_without_text_description()
+    public void Task08_errors_without_text_description()
     {
-        var sim = new Task22Delivery();
+        var sim = new Task08Delivery();
         Assert.False(sim.Submit().Success);
         Assert.False(sim.DescribesErrorsWithText);
         Assert.True(sim.DefectShown);
@@ -43,9 +43,9 @@ public class DeliveryTests
     }
 
     [Fact]
-    public void Task23_last_name_label_points_to_first_name()
+    public void Task17_last_name_label_points_to_first_name()
     {
-        var sim = new Task23Delivery();
+        var sim = new Task17Delivery();
         Assert.Equal(DeliverySimulationBase.FieldId(DeliveryField.FirstName), sim.LabelTarget(DeliveryField.LastName));
         sim.LabelClicked(DeliveryField.FirstName);
         Assert.False(sim.DefectShown);

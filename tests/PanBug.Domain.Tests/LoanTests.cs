@@ -44,9 +44,9 @@ public class LoanTests
     [Theory]
     [InlineData("10 000", "7,5", "12")]
     [InlineData("25 000", "8", "36")]
-    public void Task08_last_installment_leaves_remainder(string amount, string rate, string months)
+    public void Task14_last_installment_leaves_remainder(string amount, string rate, string months)
     {
-        var sim = new Task08Loan();
+        var sim = new Task14Loan();
         var result = Run(sim, amount, rate, months);
         Assert.NotEqual(0m, result.Schedule[^1].Remaining);
         Assert.True(sim.DefectShown);
@@ -67,9 +67,9 @@ public class LoanTests
     }
 
     [Fact]
-    public void Task09_unit_change_keeps_value_and_multiplies_period()
+    public void Task20_unit_change_keeps_value_and_multiplies_period()
     {
-        var sim = new Task09Loan();
+        var sim = new Task20Loan();
         sim.AmountText = "10 000";
         sim.RateText = "6";
         sim.PeriodText = "24";
@@ -81,9 +81,9 @@ public class LoanTests
     }
 
     [Fact]
-    public void Task09_switching_back_is_not_a_defect()
+    public void Task20_switching_back_is_not_a_defect()
     {
-        var sim = new Task09Loan();
+        var sim = new Task20Loan();
         sim.AmountText = "10 000";
         sim.RateText = "6";
         sim.PeriodText = "24";

@@ -2,18 +2,18 @@ using PanBug.Domain.Model;
 
 namespace PanBug.Domain.Tasks.Delivery;
 
-/// <summary>Zadanie 22: błędne pole ma tylko czerwoną ramkę, bez tekstu błędu i bez informacji dla czytnika ekranu.</summary>
-public sealed class Task22Delivery : DeliverySimulationBase
+/// <summary>Zadanie 8: błędne pole ma tylko czerwoną ramkę, bez tekstu błędu i bez informacji dla czytnika ekranu.</summary>
+public sealed class Task08Delivery : DeliverySimulationBase
 {
-    public Task22Delivery() : base(22, PointValue.Two) { }
+    public Task08Delivery() : base(8, PointValue.Two) { }
 
     public override bool DescribesErrorsWithText => false;
 }
 
-/// <summary>Zadanie 23: etykieta „Nazwisko” wskazuje pole „Imię”.</summary>
-public sealed class Task23Delivery : DeliverySimulationBase
+/// <summary>Zadanie 17: etykieta „Nazwisko” wskazuje pole „Imię”.</summary>
+public sealed class Task17Delivery : DeliverySimulationBase
 {
-    public Task23Delivery() : base(23, PointValue.Two) { }
+    public Task17Delivery() : base(17, PointValue.Two) { }
 
     public override string LabelTarget(DeliveryField field) =>
         FieldId(field == DeliveryField.LastName ? DeliveryField.FirstName : field);
