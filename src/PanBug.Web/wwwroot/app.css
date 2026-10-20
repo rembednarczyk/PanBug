@@ -730,6 +730,16 @@ input.invalid, textarea.invalid { border-color: var(--rose-600); box-shadow: 0 0
 }
 .categories label.check:hover { border-color: var(--accent-200); background: color-mix(in srgb, var(--accent-50) 50%, transparent); }
 .categories label.check:has(input:checked) { border-color: var(--accent-200); background: var(--accent-50); color: var(--accent-700); font-weight: 700; }
+.categories label.check:has(input:disabled) { opacity: .45; cursor: not-allowed; }
+.categories label.check:has(input:disabled):hover { border-color: var(--gray-200); background: none; }
+.category-limit { margin: -.25rem 0 .75rem; font-size: .8125rem; }
+
+/* Eksport i import wyników: InputFile schowany w etykiecie stylizowanej na przycisk. */
+.backup { display: flex; flex-direction: column; gap: .5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200); }
+.backup .muted { font-size: .8125rem; margin: 0; }
+label.file-button { flex-direction: row; align-items: center; cursor: pointer; position: relative; }
+label.file-button input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+label.file-button:focus-within { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-500); }
 
 /* ---------- Wynik i pomoc ---------- */
 
@@ -740,6 +750,21 @@ input.invalid, textarea.invalid { border-color: var(--rose-600); box-shadow: 0 0
 .result details { width: 100%; text-align: left; }
 .result summary { cursor: pointer; font-weight: 700; color: var(--gray-700); }
 .result .actions { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+/* Profil kategorii: pasek udziału zaliczonych zadań w każdej kategorii. */
+.result .profile { width: 100%; text-align: left; display: flex; flex-direction: column; gap: .5rem; }
+.result .profile h3 { display: flex; align-items: center; gap: .375rem; margin: 0; }
+.result .profile > .muted { margin: 0; font-size: .8125rem; }
+.profile-list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .375rem 1.25rem; }
+.profile-list li { display: grid; grid-template-columns: minmax(0, 1fr) 5rem 2.5rem; align-items: center; gap: .625rem; font-size: .8125rem; color: var(--gray-700); }
+.profile-name { min-width: 0; line-height: 1.35; }
+.profile-bar { height: .375rem; border-radius: 999px; background: var(--gray-100); overflow: hidden; }
+.profile-bar > span { display: block; height: 100%; border-radius: inherit; background: var(--emerald-600); }
+.profile-count { font: 700 .75rem var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; color: var(--gray-500); }
+.profile-weak { margin: 0; font-size: .8125rem; color: var(--gray-700); }
+/* Wynik do udostępnienia: pole do ręcznego kopiowania, gdy schowek jest niedostępny. */
+.result .share { width: 100%; text-align: left; display: flex; flex-direction: column; gap: .5rem; }
+.result .share textarea { width: 100%; font-family: var(--font-mono); font-size: .875rem; resize: vertical; }
+.result .share .muted { margin: 0; font-size: .8125rem; }
 .yes { color: var(--emerald-600); font-weight: 700; }
 .no { color: var(--gray-400); }
 

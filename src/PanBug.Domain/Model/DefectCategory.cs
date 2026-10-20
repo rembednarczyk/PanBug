@@ -26,6 +26,12 @@ public sealed record Answer(uint Number, string Content, string Hint);
 
 public static class DefectCategories
 {
+    /// <summary>
+    /// Najwięcej kategorii, które można wskazać w jednym zgłoszeniu. Każdy defekt ma jedną
+    /// albo dwie poprawne kategorie, więc dwie wystarczą zawsze.
+    /// </summary>
+    public const int MaxPerReport = 2;
+
     /// <summary>Pełna lista kategorii w kolejności wyświetlania.</summary>
     public static IReadOnlyList<Answer> All { get; } = new[]
     {

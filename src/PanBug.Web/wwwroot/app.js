@@ -45,6 +45,22 @@ window.panbug = {
         // Zwraca, czy zapis się udał (tryb prywatny, brak miejsca lub zablokowane dane strony: false).
         set: (key, value) => { try { localStorage.setItem(key, value); return true; } catch { return false; } },
     },
+    // Zapis pliku na dysku (eksport wyników): tekst trafia do Bloba i jest pobierany przez link.
+    download: (fileName, text, mime) => {
+        const url = URL.createObjectURL(new Blob([text], { type: mime || 'application/json' }));
+        const link = Object.assign(document.createElement('a'), { href: url, download: fileName });
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    },
+    // Kopiowanie do schowka (wynik do udostępnienia). Zwraca false, gdy przeglądarka odmówi
+    // (brak HTTPS, brak uprawnień) - wtedy UI pokazuje tekst do ręcznego skopiowania.
+    copy: async text => {
+        try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+    },
+    // Zaznacza całą treść pola tekstowego (ręczne kopiowanie wyniku).
+    select: el => el?.select(),
     // Okno modalne: fokus wchodzi do okna i krąży w nim (Tab/Shift+Tab), Escape klika przycisk
     // oznaczony data-escape (Anuluj/Nie), a po zamknięciu fokus wraca tam, skąd okno otwarto.
     modal: (() => {

@@ -1,6 +1,8 @@
 @page "/wynik"
 @inject GameSession Session
 @inject NavigationManager Nav
+@inject IJSRuntime JS
+@using PanBug.Domain.Scoring
 
 <PageTitle>Wynik · PanBug</PageTitle>
 
@@ -38,6 +40,26 @@
                 }
             </div>
 
+            <section class="profile" aria-labelledby="profile-title">
+                <h3 id="profile-title" class="eyebrow"><Icon Name="target" Size="14" />Profil kategorii</h3>
+                <p class="muted">Zadania zaliczone w pełni (defekt odtworzony, kategoria trafiona) w każdej kategorii.
+                    Zadanie z dwiema kategoriami liczy się w obu. Przy kilku zadaniach na kategorię to wskazówka, nie ocena.</p>
+                <ul class="profile-list">
+                    @foreach (var entry in profile)
+                    {
+                        <li>
+                            <span class="profile-name">@entry.Name</span>
+                            <span class="profile-bar" aria-hidden="true"><span style="width: @(Percent(entry))%"></span></span>
+                            <span class="profile-count">@entry.Solved/@entry.Tasks</span>
+                        </li>
+                    }
+                </ul>
+                @if (report.NumberOfCompletedTasks > 0 && weakest.Count > 0)
+                {
+                    <p class="profile-weak"><strong>Do poćwiczenia:</strong> @string.Join(", ", weakest.Select(e => e.Name)).</p>
+                }
+            </section>
+
             <details>
                 <summary>Szczegóły zgłoszeń</summary>
                 <div class="table-wrap">
@@ -59,18 +81,54 @@
             </details>
             <div class="actions">
                 <button class="primary big" @onclick="PlayAgain"><Icon Name="rotate-ccw" Size="16" />Zagraj ponownie</button>
+                <button class="big" @onclick="ShareAsync"><Icon Name="copy" Size="16" />Kopiuj wynik</button>
                 <a class="button big" href=""><Icon Name="house" Size="16" />Strona główna</a>
             </div>
+            @if (shareText is not null)
+            {
+                <div class="share">
+                    <Alert Text="@shareMessage" Error="false" />
+                    <textarea readonly rows="6" aria-label="Wynik do udostępnienia" value="@shareText" @onfocus="SelectShareTextAsync" @ref="shareBox"></textarea>
+                    <p class="muted">@ShareText.Solved zaliczone, @ShareText.WrongCategory defekt odtworzony bez trafionej kategorii,
+                        @ShareText.NotReproduced zgłoszone bez odtworzenia, @ShareText.NotReported bez zgłoszenia.
+                        Tekst nie zdradza defektów ani kategorii.</p>
+                </div>
+            }
         </div>
     </section>
 }
 
 @code {
+    private IReadOnlyList<CategoryProfileEntry> profile = Array.Empty<CategoryProfileEntry>();
+    private IReadOnlyList<CategoryProfileEntry> weakest = Array.Empty<CategoryProfileEntry>();
+    private string? shareText;
+    private string? shareMessage;
+    private ElementReference shareBox;
+
     protected override void OnInitialized()
     {
         if (!Session.HasResult)
+        {
             Nav.NavigateTo("", replace: true); // replace: inaczej "Wstecz" wraca na /wynik i znów przekierowuje
+            return;
+        }
+        profile = CategoryProfile.Build(Session.LastScore!);
+        weakest = CategoryProfile.Weakest(profile);
     }
+
+    private static int Percent(CategoryProfileEntry entry) => (int)Math.Round(entry.Ratio * 100);
+
+    // Tekst powstaje dopiero na żądanie gracza: porównania wyników nie są domyślne.
+    private async Task ShareAsync()
+    {
+        shareText = ShareText.Build(Session.LastScore!, Session.LastReport!, Nav.BaseUri);
+        var copied = await JS.InvokeAsync<bool>("panbug.copy", shareText);
+        shareMessage = copied
+            ? "Skopiowano wynik do schowka. Wklej go, gdzie chcesz."
+            : "Przeglądarka nie pozwoliła skopiować automatycznie. Zaznacz tekst poniżej i skopiuj go ręcznie.";
+    }
+
+    private async Task SelectShareTextAsync() => await JS.InvokeVoidAsync("panbug.select", shareBox);
 
     private void PlayAgain()
     {
