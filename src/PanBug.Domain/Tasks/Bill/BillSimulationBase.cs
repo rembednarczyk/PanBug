@@ -24,6 +24,19 @@ public abstract class BillSimulationBase : TaskBase
         "• Rachunek dzieli się na od 1 do 20 osób. Suma kwot wszystkich osób jest równa kwocie do zapłaty, a groszową resztę płacą pierwsze osoby.\n" +
         "• Każdy kod rabatowy można wykorzystać tylko raz. Wielkość liter w kodzie nie ma znaczenia.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy podział rachunku daje kwoty, które razem pokrywają cały rachunek.",
+        new TestIdea[]
+        {
+            new("Formaty", "Wpisz kwotę na każdy dozwolony sposób: ze spacją, z kropką jako separatorem tysięcy, z groszami.", DefectCategory.FormatyILokalizacja),
+            new("Grosze", "Podziel kwotę, która nie dzieli się równo, i zsumuj kwoty wszystkich osób.", DefectCategory.Obliczenia),
+            new("Granice", "Podziel rachunek na 1 i na 20 osób, potem spróbuj 0 i 21.", DefectCategory.WartosciBrzegowe),
+            new("Kody", "Użyj kodu rabatowego małymi literami, potem spróbuj użyć go drugi raz.", DefectCategory.RegulyBiznesowe),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     private static readonly Dictionary<string, int> Codes = new()
     {
         ["TESTER10"] = 10,

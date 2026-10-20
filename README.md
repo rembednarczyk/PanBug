@@ -34,6 +34,10 @@ Zgłoszenie wskazuje jedną albo dwie kategorie: każdy defekt ma ich najwyżej 
 a punkty dostaje się, gdy co najmniej jedna wskazana jest poprawna. Limit zamyka
 obejście polegające na zaznaczeniu wszystkich kategorii naraz.
 
+Pod opisem każdego zadania jest zwinięta karta misji, jak w sesji testów eksploracyjnych:
+cel i kilka pomysłów na testy, wspólne dla trzech zadań aplikacji. Karta nie nazywa kategorii,
+a każda zawiera co najmniej jeden pomysł z obszaru, w którym aplikacja nie ma defektu.
+
 Po grze ekran wyniku pokazuje profil kategorii (ile zadań z każdej kategorii zaliczono)
 i na żądanie kopiuje wynik do udostępnienia w stylu Wordle: kwadrat na zadanie, bez nazw
 defektów i kategorii.

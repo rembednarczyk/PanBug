@@ -74,6 +74,19 @@ public class WebUiTests : WebTestBase
     }
 
     [Fact]
+    public void Task_shows_a_collapsed_mission_charter_of_its_app()
+    {
+        var manager = Session.StartGame();
+        var cut = RenderComponent<Game>();
+
+        var charter = cut.Find("details.charter");
+        Assert.False(charter.HasAttribute("open")); // domyślnie zwinięta
+        var expected = manager.Current.Simulation.Charter;
+        Assert.Contains(expected.Goal, charter.TextContent);
+        Assert.Equal(expected.Ideas.Count, cut.FindAll(".charter-ideas li").Count);
+    }
+
+    [Fact]
     public void Game_without_an_active_game_returns_to_the_welcome_screen()
     {
         var nav = Services.GetRequiredService<FakeNavigationManager>();

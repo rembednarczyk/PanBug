@@ -666,6 +666,17 @@ input.invalid, textarea.invalid { border-color: var(--rose-600); box-shadow: 0 0
 .task-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
 .task-head h1 { display: flex; align-items: center; gap: .75rem; }
 .task-desc { white-space: pre-line; color: var(--gray-500); font-size: .875rem; font-weight: 500; line-height: 1.6; padding: 0 2rem 1.5rem; }
+/* Karta misji: zwijana sekcja pod opisem wymagań. */
+.charter { margin: -.5rem 2rem 1.5rem; border: 1px solid var(--gray-200); border-radius: 12px; }
+.charter summary { display: flex; align-items: center; gap: .5rem; padding: .625rem .875rem; cursor: pointer;
+    font-size: .8125rem; font-weight: 700; color: var(--accent-700); list-style: none; }
+.charter summary::-webkit-details-marker { display: none; }
+.charter summary::after { content: "+"; margin-left: auto; font: 700 1rem/1 var(--font-mono); color: var(--gray-400); }
+.charter[open] summary::after { content: "−"; }
+.charter[open] summary { border-bottom: 1px solid var(--gray-200); }
+.charter-body { padding: .75rem .875rem; display: flex; flex-direction: column; gap: .5rem; font-size: .8125rem; line-height: 1.55; color: var(--gray-700); }
+.charter-body p { margin: 0; }
+.charter-ideas { margin: 0; padding-left: 1.125rem; display: flex; flex-direction: column; gap: .375rem; }
 .task-body {
     padding: 1.5rem 2rem;
     min-height: 260px;
@@ -858,6 +869,7 @@ label.file-button:focus-within { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px
     .hero-main h1 { font-size: 1.75rem; }
     .card-head, .card-body, .task-head, .task-body, .task-actions { padding-left: 1.25rem; padding-right: 1.25rem; }
     .task-desc { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .charter { margin-left: 1.25rem; margin-right: 1.25rem; }
     .task-actions button { flex: 1; padding: .625rem .5rem; font-size: 10px; }
     .task-actions .primary { flex-basis: 100%; margin-left: 0; font-size: .8125rem; }
     .stat-grid { grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: .5rem; }

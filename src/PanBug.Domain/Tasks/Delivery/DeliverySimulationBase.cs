@@ -22,6 +22,19 @@ public abstract class DeliverySimulationBase : TaskBase
         "• Formularz spełnia wymagania dostępności WCAG: każdy błąd jest opisany tekstem przy polu, a kliknięcie etykiety przenosi kursor do jej pola.\n" +
         "• Pole „Uwagi” przyjmuje do 500 znaków, a licznik pokazuje, ile znaków zostało. Zamówienie zapisuje uwagi w całości.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy formularz da się wypełnić i poprawić także bez myszy i czy zamówienie zapisuje to, co wpisano.",
+        new TestIdea[]
+        {
+            new("Klawiatura", "Kliknij każdą etykietę, a potem przejdź cały formularz samym klawiszem Tab.", DefectCategory.Dostepnosc),
+            new("Komunikaty", "Wyślij pusty formularz i sprawdź, czy każdy błąd jest opisany przy swoim polu.", DefectCategory.InterfejsNiezgodnyZDanymi),
+            new("Złe dane", "Wpisz kod pocztowy i telefon w złym formacie, potem w dobrym.", DefectCategory.KlasyRownowaznosci),
+            new("Długi tekst", "Wpisz uwagi bliskie limitu 500 znaków i porównaj z tym, co zapisało zamówienie.", DefectCategory.SpojnoscDanych),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     private static readonly Regex PostalCodePattern = new("^[0-9]{2}-[0-9]{3}\\z", RegexOptions.CultureInvariant);
 
     private readonly Dictionary<DeliveryField, string> _errors = new();

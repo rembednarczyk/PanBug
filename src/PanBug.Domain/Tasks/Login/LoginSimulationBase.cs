@@ -22,6 +22,19 @@ public abstract class LoginSimulationBase : TaskBase
         "• Komunikat po prośbie o reset hasła nie może zdradzać, czy konto o podanym adresie istnieje.\n" +
         "• Po wylogowaniu formularz logowania jest pusty.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy logowanie, blokada konta i reset hasła chronią konto zgodnie z wymaganiami.",
+        new TestIdea[]
+        {
+            new("Warianty danych", "Zaloguj się loginem pisanym różną wielkością liter, raz z poprawnym, raz z błędnym hasłem.", DefectCategory.KlasyRownowaznosci),
+            new("Licz próby", "Policz nieudane próby logowania. Czy blokada przychodzi dokładnie po trzeciej?", DefectCategory.WartosciBrzegowe),
+            new("Co zdradza ekran", "Porównaj komunikaty dla istniejącego i nieistniejącego konta.", DefectCategory.Bezpieczenstwo),
+            new("Sekwencje", "Zaloguj się, wyloguj, zablokuj konto i odblokuj je. Po każdym kroku sprawdź formularz i stan konta.", DefectCategory.PrzejsciaStanow),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     // Liczniki nieudanych prób według klucza konta.
     private readonly Dictionary<string, int> _failures = new();
 

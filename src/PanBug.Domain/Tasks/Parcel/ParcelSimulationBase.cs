@@ -38,6 +38,19 @@ public abstract class ParcelSimulationBase : TaskBase
         "• Numer telefonu odbiorcy można wpisać tak jak w podpowiedzi pola (+48 600 000 000): ze spacjami lub bez, z kierunkowym +48 lub bez niego.\n" +
         "• Po nadaniu odbiorca dostaje 6-cyfrowy kod odbioru. Odbiór wymaga numeru telefonu i tego kodu.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy automat przyjmuje każdą paczkę zgodną z wymaganiami i wydaje ją właściwej osobie.",
+        new TestIdea[]
+        {
+            new("Granice", "Wpisz wymiary i wagę równe limitom, tuż pod nimi i tuż nad nimi.", DefectCategory.WartosciBrzegowe),
+            new("Formaty", "Wpisz telefon na każdy dozwolony sposób: ze spacjami i bez, z +48 i bez.", DefectCategory.FormatyILokalizacja),
+            new("Cała ścieżka", "Nadaj paczkę i odbierz ją. Spróbuj odebrać ją z numerem zapisanym inaczej niż przy nadaniu.", DefectCategory.SpojnoscDanych),
+            new("Powtórzenie", "Spróbuj odebrać tę samą paczkę drugi raz albo podać kod innej paczki.", DefectCategory.PrzejsciaStanow),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     // Kolejne kody odbioru (w prawdziwym paczkomacie losowe). Pierwszy zaczyna się od zera.
     private static readonly string[] Codes = { "048213", "731905", "006472", "915338", "072619", "530184" };
 
