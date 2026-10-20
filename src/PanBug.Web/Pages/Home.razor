@@ -2,6 +2,7 @@
 @inject GameSession Session
 @inject IResultStore Results
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 @using PanBug.Domain.Defects
 
 <PageTitle>PanBug: trening testowania oprogramowania</PageTitle>
@@ -79,6 +80,24 @@
                     </table>
                 </div>
             }
+            @if (history is not null)
+            {
+                <div class="backup">
+                    <div class="button-row">
+                        @if (history.Count > 0)
+                        {
+                            <button @onclick="ExportAsync"><Icon Name="download" Size="16" />Eksportuj wyniki</button>
+                        }
+                        <label class="button file-button">
+                            <Icon Name="upload" Size="16" />Importuj wyniki
+                            <InputFile @key="fileInputKey" accept=".json,application/json" OnChange="ImportAsync" />
+                        </label>
+                    </div>
+                    <p class="muted">Plik z wynikami przeniesiesz na inne urządzenie albo zachowasz po wyczyszczeniu danych przeglądarki.
+                        Import dokłada gry z pliku do historii.</p>
+                    <Alert Text="@backupMessage" Error="@backupError" />
+                </div>
+            }
         </div>
     </aside>
 </section>
@@ -91,6 +110,76 @@
     {
         best = await Results.GetBestAsync();
         history = await Results.GetHistoryAsync();
+    }
+
+    private string? backupMessage;
+    private bool backupError;
+
+    private async Task ExportAsync()
+    {
+        var json = ResultsBackup.Serialize(best, history ?? Array.Empty<GameRecord>(), DateTime.UtcNow);
+        await JS.InvokeVoidAsync("panbug.download", ResultsBackup.FileName(DateTime.Now), json, "application/json");
+        backupError = false;
+        backupMessage = $"Zapisano plik z {history!.Count} {Utils.PluralPl(history.Count, "grą", "grami", "grami")}.";
+    }
+
+    // Nowy klucz po każdym imporcie odtwarza pole pliku: bez tego ponowny wybór tego samego
+    // pliku nie wywołuje zdarzenia change i import "nic nie robi".
+    private int fileInputKey;
+
+    private async Task ImportAsync(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            await ImportFileAsync(e.File);
+        }
+        finally
+        {
+            fileInputKey++;
+        }
+    }
+
+    private async Task ImportFileAsync(IBrowserFile file)
+    {
+        backupError = true;
+        if (file.Size > ResultsBackup.MaxFileBytes)
+        {
+            backupMessage = "Plik jest za duży jak na kopię wyników PanBuga.";
+            return;
+        }
+
+        string json;
+        try
+        {
+            using var reader = new StreamReader(file.OpenReadStream(ResultsBackup.MaxFileBytes));
+            json = await reader.ReadToEndAsync();
+        }
+        catch (IOException)
+        {
+            backupMessage = "Nie udało się odczytać pliku.";
+            return;
+        }
+
+        var backup = ResultsBackup.Parse(json);
+        if (backup is null)
+        {
+            backupMessage = "To nie jest plik z wynikami PanBuga albo pochodzi z nowszej wersji gry.";
+            return;
+        }
+
+        var added = await Results.ImportAsync(backup);
+        if (added is null)
+        {
+            backupMessage = "Przeglądarka nie pozwala zapisać wyników (np. tryb prywatny).";
+            return;
+        }
+
+        best = await Results.GetBestAsync();
+        history = await Results.GetHistoryAsync();
+        backupError = false;
+        backupMessage = added == 0
+            ? "Wszystkie gry z pliku są już w historii."
+            : $"Dodano {added} {Utils.PluralPl(added.Value, "grę", "gry", "gier")} z pliku.";
     }
 
     private void StartNew()

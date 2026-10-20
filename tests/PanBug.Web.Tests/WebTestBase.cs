@@ -45,4 +45,13 @@ public sealed class InMemoryResultStore : IResultStore
         Best = record;
         return Task.FromResult(true);
     }
+
+    public Task<int?> ImportAsync(ResultsBackupFile backup)
+    {
+        var merged = ResultsBackup.Merge(Best, History, backup, LocalStorageResultStore.HistoryLimit);
+        History.Clear();
+        History.AddRange(merged.History);
+        Best = merged.Best;
+        return Task.FromResult<int?>(merged.Added);
+    }
 }

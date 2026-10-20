@@ -12,11 +12,14 @@
         {
             <div class="modal-body">
                 <p class="eyebrow">Defekt należy do kategorii*</p>
-                <div class="categories">
+                <p class="muted category-limit" id="category-limit">Wybierz jedną lub dwie kategorie
+                    (@selected.Count z @DefectCategories.MaxPerReport).</p>
+                <div class="categories" aria-describedby="category-limit">
                     @foreach (var answer in DefectCategories.All)
                     {
+                        var isChecked = selected.Contains(answer.Number);
                         <label class="check" title="@answer.Hint">
-                            <input type="checkbox" checked="@selected.Contains(answer.Number)"
+                            <input type="checkbox" checked="@isChecked" disabled="@(!isChecked && LimitReached)"
                                    @onchange="e => Toggle(answer.Number, e)" />
                             @answer.Content
                         </label>
@@ -63,9 +66,16 @@
     private bool confirming;
     private string? message;
 
+    // Limit zgłoszenia (DefectCategories.MaxPerReport): po dwóch zaznaczeniach pozostałe pola są
+    // wyłączone. Punktacja i tak odrzuca zgłoszenie z większą liczbą kategorii.
+    private bool LimitReached => selected.Count >= DefectCategories.MaxPerReport;
+
     private void Toggle(uint number, ChangeEventArgs e)
     {
-        if (e.Value is true) selected.Add(number);
+        if (e.Value is true)
+        {
+            if (!LimitReached) selected.Add(number);
+        }
         else selected.Remove(number);
     }
 

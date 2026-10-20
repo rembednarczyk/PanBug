@@ -23,9 +23,17 @@ public sealed record DefectDefinition(
         return ReproductionMarkers.Any(set.Contains);
     }
 
+    /// <summary>
+    /// Zgłoszenie trafia, gdy wskazuje najwyżej <see cref="DefectCategories.MaxPerReport"/>
+    /// kategorie i choć jedna z nich jest poprawna. Limit zamyka obejście „zaznacz wszystko”:
+    /// bez niego 12 zaznaczonych kategorii zawsze zawierało poprawną.
+    /// </summary>
     public bool CategoriesMatch(IEnumerable<uint> reported)
     {
+        var distinct = reported.ToHashSet();
+        if (distinct.Count > DefectCategories.MaxPerReport)
+            return false;
         var expected = Categories.Select(c => (uint)c).ToHashSet();
-        return reported.Any(expected.Contains);
+        return distinct.Any(expected.Contains);
     }
 }

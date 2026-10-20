@@ -29,6 +29,12 @@ public interface IResultStore
 
     /// <summary>Zapisuje grę w historii; zwraca true, gdy to nowy najlepszy wynik.</summary>
     Task<bool> SaveAsync(GameRecord record);
+
+    /// <summary>
+    /// Dokłada wyniki z pliku kopii (<see cref="ResultsBackup"/>) do zapisanych.
+    /// Zwraca liczbę dodanych gier albo null, gdy zapis się nie udał.
+    /// </summary>
+    Task<int?> ImportAsync(ResultsBackupFile backup);
 }
 
 /// <summary>Magazyn wyników w localStorage przeglądarki.</summary>
@@ -73,6 +79,16 @@ public sealed class LocalStorageResultStore : IResultStore
         if (!record.IsBetterThan(best))
             return false;
         return await WriteAsync(BestKey, record);
+    }
+
+    public async Task<int?> ImportAsync(ResultsBackupFile backup)
+    {
+        var merged = ResultsBackup.Merge(await GetBestAsync(), await GetHistoryAsync(), backup, HistoryLimit);
+        if (!await WriteAsync(HistoryKey, merged.History))
+            return null;
+        if (merged.Best is not null && !await WriteAsync(BestKey, merged.Best))
+            return null;
+        return merged.Added;
     }
 
     private async Task<T?> ReadAsync<T>(string key) where T : class

@@ -56,6 +56,49 @@ public class ScoringTests
     }
 
     [Fact]
+    public void Selecting_every_category_no_longer_scores()
+    {
+        // Obejście sprzed limitu: zaznaczenie wszystkich 12 kategorii zawsze zawierało poprawną.
+        var report = SampleReport(new ReportTask(23)
+        {
+            IsCompleted = true,
+            AnswerNumbers = DefectCategories.All.Select(a => a.Number).ToArray(),
+            Actions = new uint[] { TaskBase.DefectMarker },
+        });
+
+        var task = new StandardScoringEngine().Score(report).Breakdown.Single();
+
+        Assert.Equal(0, task.AwardedPoints);
+        Assert.True(task.Reproduced);
+        Assert.False(task.CategoryMatched);
+    }
+
+    [Theory]
+    [InlineData(new uint[] { 4, 8 }, 4)]      // obie poprawne
+    [InlineData(new uint[] { 4, 1 }, 4)]      // jedna poprawna, jedna nie: limit, nie kara
+    [InlineData(new uint[] { 4, 8, 1 }, 0)]   // trzy to ponad limit, nawet z dwiema poprawnymi
+    [InlineData(new uint[] { 4, 4, 4 }, 4)]   // powtórzenia liczą się raz
+    public void Report_may_name_at_most_two_categories(uint[] answers, int expected)
+    {
+        // Zadanie 23 (4 pkt): przejścia stanów (4) i spójność danych (8).
+        var report = SampleReport(new ReportTask(23)
+        {
+            IsCompleted = true,
+            AnswerNumbers = answers,
+            Actions = new uint[] { TaskBase.DefectMarker },
+        });
+
+        Assert.Equal(expected, new StandardScoringEngine().Score(report).Points);
+    }
+
+    [Fact]
+    public void Every_defect_fits_within_the_category_limit()
+    {
+        // Gdyby defekt miał więcej poprawnych kategorii niż limit, nie dałoby się wskazać wszystkich.
+        Assert.All(DefectCatalog.All, d => Assert.InRange(d.Categories.Count, 1, DefectCategories.MaxPerReport));
+    }
+
+    [Fact]
     public void Scoring_partial_credit_option()
     {
         var report = SampleReport(new ReportTask(23) // 4 punkty

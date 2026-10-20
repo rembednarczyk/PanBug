@@ -30,6 +30,13 @@ Kategorie zgłoszenia (12) łączą techniki projektowania testów z sylabusa IS
 (wartości brzegowe, klasy równoważności, reguły biznesowe, przejścia stanów) z obszarami
 jakości: obliczenia, daty, formaty, spójność danych, interfejs, bezpieczeństwo,
 dostępność i niezawodność. Za zadanie można zdobyć od 1 do 4 punktów, łącznie 51.
+Zgłoszenie wskazuje jedną albo dwie kategorie: każdy defekt ma ich najwyżej dwie,
+a punkty dostaje się, gdy co najmniej jedna wskazana jest poprawna. Limit zamyka
+obejście polegające na zaznaczeniu wszystkich kategorii naraz.
+
+Po grze ekran wyniku pokazuje profil kategorii (ile zadań z każdej kategorii zaliczono)
+i na żądanie kopiuje wynik do udostępnienia w stylu Wordle: kwadrat na zadanie, bez nazw
+defektów i kategorii.
 
 Opis defektów i kroki ich odtworzenia są w kluczu dla prowadzącego, który nie jest
 częścią repozytorium. Aplikacja zapisuje odtworzenie defektu dopiero wtedy, gdy defekt
@@ -132,7 +139,9 @@ Tę samą zawartość `publish/wwwroot` można opublikować na innym hostingu st
 ## Ograniczenia wersji statycznej
 
 - **Brak kont i rankingu Top 100.** Wyniki są widoczne tylko na urządzeniu,
-  na którym grano, i znikają po wyczyszczeniu danych przeglądarki.
+  na którym grano, i znikają po wyczyszczeniu danych przeglądarki. Ekran powitalny
+  pozwala wyeksportować je do pliku JSON i zaimportować na innym urządzeniu (import
+  dokłada gry do historii, nie nadpisuje jej).
 - **Klucz odpowiedzi jest w przeglądarce.** Punktacja liczy się lokalnie, więc
   zdeterminowany gracz może podejrzeć poprawne kategorie w plikach aplikacji.
   Dla aplikacji treningowej bez rankingu to akceptowalne.
