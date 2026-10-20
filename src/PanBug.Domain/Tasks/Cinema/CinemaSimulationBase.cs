@@ -46,6 +46,19 @@ public abstract class CinemaSimulationBase : TaskBase
         "• Bilet ulgowy (18,00 zł) przysługuje widzom w wieku do 12 lat włącznie, pozostali płacą 28,00 zł.\n" +
         "• Wiek widza to liczba od 1 do 120.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy rezerwacja liczy bilety i ceny zgodnie z wymaganiami i czy lista dnia pokazuje właściwe seanse.",
+        new TestIdea[]
+        {
+            new("Granice", "Wypróbuj wartości na granicach z wymagań i tuż obok nich: wiek widza, liczba miejsc.", DefectCategory.WartosciBrzegowe),
+            new("Złe dane", "Wpisz wiek, który nie ma sensu: 0, 121, puste pole, litery. Czy aplikacja go odrzuca?", DefectCategory.KlasyRownowaznosci),
+            new("Zmiana zdania", "Zaznaczaj i odznaczaj miejsca, wracaj do listy seansów. Czy podsumowanie nadąża za wyborem?", DefectCategory.PrzejsciaStanow),
+            new("Kalendarz", "Przejrzyj seanse w różne dni i o różnych porach, także późno w nocy.", DefectCategory.DatyICzas),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     private static readonly HashSet<Seat> Occupied = new()
     {
         new(1, 4), new(1, 5), new(2, 6), new(3, 1), new(3, 2), new(4, 8), new(5, 5), new(6, 9), new(6, 10),

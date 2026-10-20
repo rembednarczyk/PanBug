@@ -38,6 +38,19 @@ public abstract class LeaveSimulationBase : TaskBase
         "• Dni są rezerwowane z puli przy złożeniu wniosku. Anulowanie wniosku, oczekującego lub zaakceptowanego, zwraca dni do puli.\n" +
         "• Przycisk „Zaakceptuj” symuluje decyzję przełożonego.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy planer liczy dni urlopu i pule obu lat zgodnie z wymaganiami.",
+        new TestIdea[]
+        {
+            new("Kalendarz", "Złóż wnioski obejmujące weekend, cały tydzień i przełom roku.", DefectCategory.DatyICzas),
+            new("Granice", "Wykorzystaj pulę co do dnia, a potem spróbuj wziąć jeszcze jeden.", DefectCategory.WartosciBrzegowe),
+            new("Złe dane", "Podaj datę końca wcześniejszą niż początek albo datę z zeszłego roku.", DefectCategory.KlasyRownowaznosci),
+            new("Cykl życia", "Przeprowadź wniosek przez wszystkie stany: złożony, zaakceptowany, anulowany. Po każdym kroku sprawdź pulę.", DefectCategory.PrzejsciaStanow),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     private readonly Dictionary<int, int> _used = new();
     private readonly List<LeaveRequest> _requests = new();
 

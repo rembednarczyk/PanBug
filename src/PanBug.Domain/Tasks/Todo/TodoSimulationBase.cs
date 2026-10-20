@@ -33,6 +33,20 @@ public abstract class TodoSimulationBase : TaskBase
         "• Przycisk usuwania usuwa zadanie z tego samego wiersza, także przy włączonym filtrze.\n" +
         "• Lista pokazuje terminy w formacie dd.mm.rrrr.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy filtr, sortowanie i usuwanie działają poprawnie dla zadań o różnych terminach.",
+        new TestIdea[]
+        {
+            new("Granice czasu", "Dodaj zadania z terminem wczoraj, dziś i jutro, potem włącz filtr „Zaległe”.", DefectCategory.WartosciBrzegowe),
+            new("Kolejność", "Dodaj terminy z różnych miesięcy i lat, potem posortuj listę.", DefectCategory.DatyICzas),
+            new("Format", "Sprawdź, jak lista pokazuje terminy z jednocyfrowym dniem i miesiącem.", DefectCategory.FormatyILokalizacja),
+            new("Akcja w widoku", "Usuń zadanie przy włączonym filtrze i sprawdź, które zniknęło.", DefectCategory.SpojnoscDanych),
+            new("Złe dane", "Dodaj zadanie bez nazwy albo bez terminu.", DefectCategory.KlasyRownowaznosci),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     private readonly List<TodoItem> _items = new();
 
     protected TodoSimulationBase(uint number, PointValue points, DateOnly? today)

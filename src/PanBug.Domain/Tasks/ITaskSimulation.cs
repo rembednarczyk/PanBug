@@ -13,6 +13,9 @@ public interface ITaskSimulation
     PointValue Points { get; }
     string Description { get; }
 
+    /// <summary>Karta misji aplikacji: cel i pomysły na testy, wspólne dla jej trzech zadań.</summary>
+    MissionCharter Charter { get; }
+
     /// <summary>Kategorie defektów prezentowane w oknie zgłoszenia.</summary>
     IReadOnlyList<Answer> Categories { get; }
 

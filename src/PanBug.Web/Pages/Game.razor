@@ -50,6 +50,21 @@
                 <span class="badge"><Icon Name="trophy" Size="12" />Punktów do zdobycia: @((int)slot.Simulation.Points)</span>
             </header>
             <p class="task-desc">@slot.Simulation.Description</p>
+            @* Karta misji jest domyślnie zwinięta: gracz, który woli szukać sam, nie widzi pomysłów. *@
+            <details class="charter">
+                <summary><Icon Name="target" Size="14" />Karta misji: cel i pomysły na testy</summary>
+                <div class="charter-body">
+                    <p><strong>Cel:</strong> @slot.Simulation.Charter.Goal</p>
+                    <ul class="charter-ideas">
+                        @foreach (var idea in slot.Simulation.Charter.Ideas)
+                        {
+                            <li><strong>@idea.Heuristic.</strong> @idea.Question</li>
+                        }
+                    </ul>
+                    <p class="muted">Proponowany czas: do @MissionCharter.SuggestedMinutes minut. Jeśli nic nie znajdziesz,
+                        przejdź do następnego zadania i wróć tu później. Karta jest wspólna dla zadań tej samej aplikacji.</p>
+                </div>
+            </details>
             <div class="task-body">
                 <DynamicComponent @key="version"
                                   Type="TaskComponentRegistry.ComponentFor(slot.Simulation)"

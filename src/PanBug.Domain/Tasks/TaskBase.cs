@@ -23,6 +23,7 @@ public abstract class TaskBase : ITaskSimulation
     public uint Number { get; }
     public PointValue Points { get; }
     public string Description { get; }
+    public abstract MissionCharter Charter { get; }
     public IReadOnlyList<Answer> Categories => DefectCategories.All;
     public IReadOnlyList<uint> Actions => _actionLog.Actions;
 

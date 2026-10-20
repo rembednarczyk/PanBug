@@ -32,6 +32,19 @@ public abstract class LoanSimulationBase : TaskBase
         "• Okres podaje się w miesiącach (1–360) albo w latach (1–30). Zmiana jednostki przelicza wpisaną wartość, np. 24 miesiące → 2 lata. Niepełny rok zaokrągla się w górę.\n" +
         "• Harmonogram pokazuje wszystkie raty. Suma części kapitałowych jest równa kwocie kredytu, a po ostatniej racie do spłaty zostaje 0,00 zł. Ostatnia rata może różnić się od pozostałych o kilka groszy.";
 
+    /// <summary>Karta misji wspólna dla trzech zadań aplikacji.</summary>
+    public static readonly MissionCharter AppCharter = new(
+        "Sprawdź, czy rata i harmonogram są poprawne w całym dozwolonym zakresie danych.",
+        new TestIdea[]
+        {
+            new("Granice", "Policz ratę dla skrajnych wartości: najmniejszej i największej kwoty, oprocentowania i okresu.", DefectCategory.WartosciBrzegowe),
+            new("Złe dane", "Wpisz wartości spoza zakresu albo zostaw puste pole. Czy kalkulator to zgłasza?", DefectCategory.KlasyRownowaznosci),
+            new("Sprawdź rachunki", "Zsumuj części kapitałowe z harmonogramu i porównaj z kwotą kredytu.", DefectCategory.Obliczenia),
+            new("Ekran a dane", "Zmieniaj jednostkę okresu i porównuj liczbę rat w harmonogramie z tym, co wpisałeś.", DefectCategory.InterfejsNiezgodnyZDanymi),
+        });
+
+    public sealed override MissionCharter Charter => AppCharter;
+
     private string _periodText = string.Empty;
     // Jednostka, w której wpisano wartość okresu. Inna niż bieżąca = wartość nieprzeliczona.
     private PeriodUnit _enteredUnit = PeriodUnit.Months;
